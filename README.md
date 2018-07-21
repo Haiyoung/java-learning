@@ -2,5 +2,5 @@
 Always keep learning and look forward to new opportunities.
 
 |[Redis](./redis.md)|
-|------|
-|<i class="fas fa-registered"></i>|
+|:------:|
+|<img height="22" width="30" src="https://redis.io/images/redis-small.png" />|
