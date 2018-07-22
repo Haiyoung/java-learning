@@ -1,14 +1,17 @@
 <!-- TOC -->
 
-- [Redis 概况](#redis-概况)
-    - [Redis 是什么？](#redis-是什么)
-    - [Redis 数据结构](#redis-数据结构)
-        - [value 对应的五种数据结构](#value-对应的五种数据结构)
-        - [Redis 核心对象 redisObject](#redis-核心对象-redisobject)
-            - [编码方式（encoding）](#编码方式encoding)
-        - [Redis 五种数据结构对应的内部编码](#redis-五种数据结构对应的内部编码)
+- [Redis 概况](#redis-%E6%A6%82%E5%86%B5)
+    - [Redis 是什么？](#redis-%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F)
+    - [Redis 数据结构](#redis-%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84)
+        - [value 对应的五种数据结构](#value-%E5%AF%B9%E5%BA%94%E7%9A%84%E4%BA%94%E7%A7%8D%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84)
+        - [Redis 核心对象 redisObject](#redis-%E6%A0%B8%E5%BF%83%E5%AF%B9%E8%B1%A1-redisobject)
+            - [编码方式（encoding）](#%E7%BC%96%E7%A0%81%E6%96%B9%E5%BC%8F%EF%BC%88encoding%EF%BC%89)
+        - [Redis 五种数据结构对应的内部编码](#redis-%E4%BA%94%E7%A7%8D%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%AF%B9%E5%BA%94%E7%9A%84%E5%86%85%E9%83%A8%E7%BC%96%E7%A0%81)
     - [reference](#reference)
-- [搭建 Redis 环境](#搭建-redis-环境)
+- [搭建 Redis 环境](#%E6%90%AD%E5%BB%BA-redis-%E7%8E%AF%E5%A2%83)
+    - [启动 redis server](#%E5%90%AF%E5%8A%A8-redis-server)
+    - [启动 redis-cli](#%E5%90%AF%E5%8A%A8-redis-cli)
+    - [reference](#reference)
 
 <!-- /TOC -->
 
@@ -89,6 +92,7 @@ Redis在不同的情况下会为数据对象选择适合的编码方式
 ### 搭建 Redis 环境
 
 由于Redis对windows的支持不友好，所以这儿介绍使用docker容器来启动 redis
+#### 启动 redis server
 - 拉取 redis 镜像
 ```shell
 # 拉取 redis 镜像，不输入version时，默认拉取最新的发行版
@@ -109,6 +113,7 @@ redis                          latest              c5355f8853e4        3 months 
 CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS               NAMES
 bed6a2a9b3bc        redis               "docker-entrypoint.s…"   6 weeks ago         Up 25 hours         6379/tcp            redis-S
 ```
+#### 启动 redis-cli
 - 启动 redis-cli
     - 直接启动 redis-S 容器的 redis-cli
     ```shell
@@ -130,3 +135,6 @@ bed6a2a9b3bc        redis               "docker-entrypoint.s…"   6 weeks ago  
     2) "testzset"
     redis-S:6379>
     ```
+#### reference
+- [Docker 安装 Redis](http://www.runoob.com/docker/docker-install-redis.html)
+- [Docker 容器启动 redis](https://www.yuque.com/haiyoung/useful_notes/rpb8zg)
