@@ -1,6 +1,6 @@
 <!-- TOC -->
 
-- [Redis 基础](#redis-基础)
+- [Redis 概况](#redis-概况)
     - [Redis 是什么？](#redis-是什么)
     - [Redis 数据结构](#redis-数据结构)
         - [value 对应的五种数据结构](#value-对应的五种数据结构)
@@ -8,15 +8,17 @@
             - [编码方式（encoding）](#编码方式encoding)
         - [Redis 五种数据结构对应的内部编码](#redis-五种数据结构对应的内部编码)
     - [reference](#reference)
+- [搭建 Redis 环境](#搭建-redis-环境)
 
 <!-- /TOC -->
 
-### Redis 基础
+### Redis 概况
 
 #### Redis 是什么？
 Redis是一个开源（BSD许可）的，利用内存进行存储的数据结构存储系统；它可以用作数据库、缓存和消息中间件。
 - redis由意大利人 Salvatore Sanfilippo 使用C语言开发
 - redis支持字符串（string）、列表（list）、集合（set）、有序集合（zset）、散列表（hash）五种基本数据结构类型
+- redis从 2.2.0 版本开始支持bitmap；在 2.8.9 版本添加了 HyperLogLog 用以进行基数统计；在 3.2 版本中新增了对GEO(地理位置)的支持
 - redis支持简单事物与数据持久化，提供 RDB、AOF两种可选的持久化方式
 - redis可以用作数据库、缓存、消息队列等
 
@@ -82,3 +84,49 @@ Redis在不同的情况下会为数据对象选择适合的编码方式
 - [菜鸟教程-Redis](http://www.runoob.com/redis/redis-tutorial.html)
 - [Redis数据编码方式详解](https://yq.aliyun.com/articles/63461)
 - [Redis的五种数据结构的内部编码](https://www.cnblogs.com/yangmingxianshen/p/8054094.html)
+
+
+### 搭建 Redis 环境
+
+由于Redis对windows的支持不友好，所以这儿介绍使用docker容器来启动 redis
+- 拉取 redis 镜像
+```shell
+# 拉取 redis 镜像，不输入version时，默认拉取最新的发行版
+# 命令 docker pull redis:[version]
+λ  docker pull redis
+λ  docker images
+REPOSITORY                     TAG                 IMAGE ID            CREATED             SIZE
+redis                          latest              c5355f8853e4        3 months ago        107MB
+```
+- 启动容器
+```shell
+# 从 redis 镜像启动一个容器，命名为 redis-S
+# -d 后台运行
+# -name 指定容器的名称
+# -v 给redis的data目录挂载本地磁盘空间($PWD/data 当前目录下的data)
+λ  docker run -d --name redis-S -v $PWD/data:/data redis redis-server
+λ  docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS               NAMES
+bed6a2a9b3bc        redis               "docker-entrypoint.s…"   6 weeks ago         Up 25 hours         6379/tcp            redis-S
+```
+- 启动 redis-cli
+    - 直接启动 redis-S 容器的 redis-cli
+    ```shell
+    # 执行如下命令，进入客户端
+    λ  docker exec -it bed6 redis-cli
+    127.0.0.1:6379> keys *
+    1) "xxx"
+    2) "testzset"
+    127.0.0.1:6379>
+    ```
+    - 启动一个新容器链接到 redis-S, 开启 redis-cli 客户端
+    ```shell
+    # -it是交互模式(-i: 以交互模式运行容器,-t: 为容器重新分配一个伪输入终端) 
+    # –link 连接另一个容器,这样就可以使用容器名作为host了 
+    # –rm 在容器退出时就能够自动清理容器内部的文件系统, --rm选项也会清理容器的匿名data volumes, 执行docker run命令带--rm命令选项，等价于在容器退出后，执行docker rm -v
+    λ  docker run -it --link redis-S --rm redis redis-cli -h redis-S -p 6379
+    redis-S:6379> keys *
+    1) "xxx"
+    2) "testzset"
+    redis-S:6379>
+    ```
