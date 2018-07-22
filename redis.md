@@ -114,27 +114,27 @@ CONTAINER ID        IMAGE               COMMAND                  CREATED        
 bed6a2a9b3bc        redis               "docker-entrypoint.s…"   6 weeks ago         Up 25 hours         6379/tcp            redis-S
 ```
 #### 启动 redis-cli
-- 启动 redis-cli
-    - 直接启动 redis-S 容器的 redis-cli
-    ```shell
-    # 执行如下命令，进入客户端
-    λ  docker exec -it bed6 redis-cli
-    127.0.0.1:6379> keys *
-    1) "xxx"
-    2) "testzset"
-    127.0.0.1:6379>
-    ```
-    - 启动一个新容器链接到 redis-S, 开启 redis-cli 客户端
-    ```shell
-    # -it是交互模式(-i: 以交互模式运行容器,-t: 为容器重新分配一个伪输入终端) 
-    # –link 连接另一个容器,这样就可以使用容器名作为host了 
-    # –rm 在容器退出时就能够自动清理容器内部的文件系统, --rm选项也会清理容器的匿名data volumes, 执行docker run命令带--rm命令选项，等价于在容器退出后，执行docker rm -v
-    λ  docker run -it --link redis-S --rm redis redis-cli -h redis-S -p 6379
-    redis-S:6379> keys *
-    1) "xxx"
-    2) "testzset"
-    redis-S:6379>
-    ```
+
+- 直接启动 redis-S 容器的 redis-cli
+```shell
+# 执行如下命令，进入客户端
+λ  docker exec -it bed6 redis-cli
+127.0.0.1:6379> keys *
+1) "xxx"
+2) "testzset"
+127.0.0.1:6379>
+```
+- 启动一个新容器链接到 redis-S, 开启 redis-cli 客户端
+```shell
+# -it是交互模式(-i: 以交互模式运行容器,-t: 为容器重新分配一个伪输入终端) 
+# –link 连接另一个容器,这样就可以使用容器名作为host了 
+# –rm 在容器退出时就能够自动清理容器内部的文件系统, --rm选项也会清理容器的匿名data volumes, 执行docker run命令带--rm命令选项，等价于在容器退出后，执行docker rm -v
+λ  docker run -it --link redis-S --rm redis redis-cli -h redis-S -p 6379
+redis-S:6379> keys *
+1) "xxx"
+2) "testzset"
+redis-S:6379>
+```
 #### reference
 - [Docker 安装 Redis](http://www.runoob.com/docker/docker-install-redis.html)
 - [Docker 容器启动 redis](https://www.yuque.com/haiyoung/useful_notes/rpb8zg)
