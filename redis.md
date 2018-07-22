@@ -91,7 +91,7 @@ Redis在不同的情况下会为数据对象选择适合的编码方式
 
 ### 搭建 Redis 环境
 
-由于Redis对windows的支持不友好，所以这儿介绍使用docker容器来启动 redis
+由于Redis对windows的支持不友好，所以这儿介绍使用docker容器来启动 redis(只用于体验redis,不涉及各种详细配置)
 #### 启动 redis server
 - 拉取 redis 镜像
 ```shell
