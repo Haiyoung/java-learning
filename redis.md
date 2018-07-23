@@ -1,18 +1,21 @@
 Redis
 <!-- TOC -->
 
-- [Redis 概况](#redis-%E6%A6%82%E5%86%B5)
-    - [Redis 是什么？](#redis-%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F)
-    - [Redis 数据结构](#redis-%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84)
-        - [value 对应的五种数据结构](#value-%E5%AF%B9%E5%BA%94%E7%9A%84%E4%BA%94%E7%A7%8D%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84)
-        - [Redis 核心对象 redisObject](#redis-%E6%A0%B8%E5%BF%83%E5%AF%B9%E8%B1%A1-redisobject)
-            - [编码方式（encoding）](#%E7%BC%96%E7%A0%81%E6%96%B9%E5%BC%8F%EF%BC%88encoding%EF%BC%89)
-        - [Redis 五种数据结构对应的内部编码](#redis-%E4%BA%94%E7%A7%8D%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%AF%B9%E5%BA%94%E7%9A%84%E5%86%85%E9%83%A8%E7%BC%96%E7%A0%81)
+- [Redis 概况](#redis-概况)
+    - [Redis 是什么？](#redis-是什么)
+    - [Redis 数据结构](#redis-数据结构)
+        - [value 对应的五种数据结构](#value-对应的五种数据结构)
+        - [Redis 核心对象 redisObject](#redis-核心对象-redisobject)
+            - [编码方式（encoding）](#编码方式encoding)
+        - [Redis 五种数据结构对应的内部编码](#redis-五种数据结构对应的内部编码)
     - [reference](#reference)
-- [搭建 Redis 环境](#%E6%90%AD%E5%BB%BA-redis-%E7%8E%AF%E5%A2%83)
-    - [启动 redis server](#%E5%90%AF%E5%8A%A8-redis-server)
-    - [启动 redis-cli](#%E5%90%AF%E5%8A%A8-redis-cli)
-    - [reference](#reference)
+- [搭建 Redis 环境](#搭建-redis-环境)
+    - [启动 redis server](#启动-redis-server)
+    - [启动 redis-cli](#启动-redis-cli)
+    - [redis-cli连接远程服务](#redis-cli连接远程服务)
+    - [reference](#reference-1)
+- [Redis命令](#redis命令)
+    - [Redis keys 命令](#redis-keys-命令)
 
 <!-- /TOC -->
 
@@ -136,6 +139,43 @@ redis-S:6379> keys *
 2) "testzset"
 redis-S:6379>
 ```
+#### redis-cli连接远程服务
+用法：redis-cli [OPTIONS] [cmd [arg [arg ...]]]
+
+-h <主机ip>，默认是127.0.0.1
+
+-p <端口>，默认是6379
+
+-a <密码>，如果redis加锁，需要传递密码
+
+--help，显示帮助信息
+```shell
+haiyoung@haiyoung ~ $ redis-cli -h 127.0.0.1 -p 6379
+127.0.0.1:6379> ping
+PONG
+```
+
 #### reference
 - [Docker 安装 Redis](http://www.runoob.com/docker/docker-install-redis.html)
 - [Docker 容器启动 redis](https://www.yuque.com/haiyoung/useful_notes/rpb8zg)
+
+### Redis命令
+#### Redis keys 命令
+|序号|命令|描述|
+|:------|:------|:------|
+|1|DEL key|该命令用于在 key 存在时删除 key，返回被删除 key 的数量|
+|2|DUMP key|序列化给定 key ，并返回被序列化的值|
+|3|EXISTS key|检查给定 key 是否存在，若 key 存在返回 1 ，否则返回 0 |
+|4|EXPIRE key seconds|为给定 key 设置过期时间，设置成功返回 1 |
+|5|EXPIREAT key timestamp|EXPIREAT 的作用和 EXPIRE 类似，都用于为 key 设置过期时间。 不同在于 EXPIREAT 命令接受的时间参数是 UNIX 时间戳(unix timestamp)，设置成功返回 1|
+|6|PEXPIRE key milliseconds|设置 key 的过期时间以毫秒计，设置成功，返回 1,key 不存在或设置失败，返回 0|
+|7|PEXPIREAT key milliseconds-timestamp|设置 key 过期时间的时间戳(unix timestamp) 以毫秒计, 设置成功返回 1|
+|8|	KEYS pattern|查找所有符合给定模式( pattern)的 key,返回符合给定模式的 key 列表 (Array)|
+|9|MOVE key db|将当前数据库的 key 移动到给定的数据库 db 当中,移动成功返回 1 ，失败则返回 0|
+|10|PERSIST key|移除 key 的过期时间，key 将持久保持，当过期时间移除成功时，返回 1 。 如果 key 不存在或 key 没有设置过期时间，返回 0|
+|11|PTTL key|以毫秒为单位返回 key 的剩余的过期时间,当 key 不存在时，返回 -2 。 当 key 存在但没有设置剩余生存时间时，返回 -1 。 否则，以毫秒为单位，返回 key 的剩余生存时间|
+|12|TTL key|以秒为单位，返回给定 key 的剩余生存时间(TTL, time to live),当 key 不存在时，返回 -2 。 当 key 存在但没有设置剩余生存时间时，返回 -1 。 否则，以秒为单位，返回 key 的剩余生存时间|
+|13|RANDOMKEY|从当前数据库中随机返回一个 key，当数据库不为空时，返回一个 key 。 当数据库为空时，返回 nil （windows 系统返回 null）|
+|14|RENAME key newkey|修改 key 的名称，改名成功时提示 OK ，失败时候返回一个错误。当 OLD_KEY_NAME 和 NEW_KEY_NAME 相同，或者 OLD_KEY_NAME 不存在时，返回一个错误。 当 NEW_KEY_NAME 已经存在时， RENAME 命令将覆盖旧值|
+|15|RENAMENX key newkey|仅当 newkey 不存在时，将 key 改名为 newkey，修改成功时，返回 1 。 如果 NEW_KEY_NAME 已经存在，返回 0 |
+|16|TYPE key|返回 key 所储存的值的类型|
