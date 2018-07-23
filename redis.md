@@ -1,21 +1,23 @@
 Redis
 <!-- TOC -->
 
-- [Redis 概况](#redis-概况)
-    - [Redis 是什么？](#redis-是什么)
-    - [Redis 数据结构](#redis-数据结构)
-        - [value 对应的五种数据结构](#value-对应的五种数据结构)
-        - [Redis 核心对象 redisObject](#redis-核心对象-redisobject)
-            - [编码方式（encoding）](#编码方式encoding)
-        - [Redis 五种数据结构对应的内部编码](#redis-五种数据结构对应的内部编码)
+- [Redis 概况](#redis-%E6%A6%82%E5%86%B5)
+    - [Redis 是什么？](#redis-%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F)
+    - [Redis 数据结构](#redis-%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84)
+        - [value 对应的五种数据结构](#value-%E5%AF%B9%E5%BA%94%E7%9A%84%E4%BA%94%E7%A7%8D%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84)
+        - [Redis 核心对象 redisObject](#redis-%E6%A0%B8%E5%BF%83%E5%AF%B9%E8%B1%A1-redisobject)
+            - [编码方式（encoding）](#%E7%BC%96%E7%A0%81%E6%96%B9%E5%BC%8F%EF%BC%88encoding%EF%BC%89)
+        - [Redis 五种数据结构对应的内部编码](#redis-%E4%BA%94%E7%A7%8D%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%AF%B9%E5%BA%94%E7%9A%84%E5%86%85%E9%83%A8%E7%BC%96%E7%A0%81)
     - [reference](#reference)
-- [搭建 Redis 环境](#搭建-redis-环境)
-    - [启动 redis server](#启动-redis-server)
-    - [启动 redis-cli](#启动-redis-cli)
-    - [redis-cli连接远程服务](#redis-cli连接远程服务)
-    - [reference](#reference-1)
-- [Redis命令](#redis命令)
-    - [Redis keys 命令](#redis-keys-命令)
+- [搭建 Redis 环境](#%E6%90%AD%E5%BB%BA-redis-%E7%8E%AF%E5%A2%83)
+    - [启动 redis server](#%E5%90%AF%E5%8A%A8-redis-server)
+    - [启动 redis-cli](#%E5%90%AF%E5%8A%A8-redis-cli)
+    - [redis-cli连接远程服务](#redis-cli%E8%BF%9E%E6%8E%A5%E8%BF%9C%E7%A8%8B%E6%9C%8D%E5%8A%A1)
+    - [reference](#reference)
+- [Redis命令](#redis%E5%91%BD%E4%BB%A4)
+    - [Redis keys 命令](#redis-keys-%E5%91%BD%E4%BB%A4)
+    - [Redis 字符串命令](#redis-%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%91%BD%E4%BB%A4)
+    - [reference](#reference)
 
 <!-- /TOC -->
 
@@ -179,3 +181,78 @@ PONG
 |14|RENAME key newkey|修改 key 的名称，改名成功时提示 OK ，失败时候返回一个错误。当 OLD_KEY_NAME 和 NEW_KEY_NAME 相同，或者 OLD_KEY_NAME 不存在时，返回一个错误。 当 NEW_KEY_NAME 已经存在时， RENAME 命令将覆盖旧值|
 |15|RENAMENX key newkey|仅当 newkey 不存在时，将 key 改名为 newkey，修改成功时，返回 1 。 如果 NEW_KEY_NAME 已经存在，返回 0 |
 |16|TYPE key|返回 key 所储存的值的类型|
+
+#### Redis 字符串命令
+- SET key value 设置指定 key 的值
+- GET key 获取指定 key 的值
+- GETRANGE key start end 返回 key 中字符串值的子字符
+- GETSET key value 将给定 key 的值设为 value ，并返回 key 的旧值(old value)
+    ```shell
+    127.0.0.1:6379> keys *
+    (empty list or set)
+    127.0.0.1:6379> set key001 001
+    OK
+    127.0.0.1:6379> get key001
+    "001"
+    127.0.0.1:6379> getrange key001 0 1
+    "00"
+    127.0.0.1:6379> getset key001 002
+    "001"
+    127.0.0.1:6379> get key001
+    "002"
+    ```
+- SETBIT key offset value 对 key 所储存的字符串值，设置或清除指定偏移量上的位(bit)
+- GETBIT key offset 对 key 所储存的字符串值，获取指定偏移量上的位(bit)
+    ```shell
+    127.0.0.1:6379> keys *
+    1) "key001"
+    127.0.0.1:6379> setbit key001 3 1
+    (integer) 1
+    127.0.0.1:6379> getbit key001 3
+    (integer) 1
+    127.0.0.1:6379> getbit key001 7
+    (integer) 0
+    127.0.0.1:6379> getbit key002 3
+    (integer) 0
+    ```
+- MSET key value [key value ...] 同时设置一个或多个 key-value 对
+- MSETNX key value [key value ...] 同时设置一个或多个 key-value 对，当且仅当所有给定 key 都不存在
+- MGET key1 [key2..] 获取所有(一个或多个)给定 key 的值
+    ```shell
+    127.0.0.1:6379> keys *
+    (empty list or set)
+    127.0.0.1:6379> mset key001 001 key002 002
+    OK
+    127.0.0.1:6379> keys *
+    1) "key001"
+    2) "key002"
+    127.0.0.1:6379> mget key001 key002
+    1) "001"
+    2) "002"
+    127.0.0.1:6379> msetnx key002 003 key004 004
+    (integer) 0
+    127.0.0.1:6379> keys *
+    1) "key001"
+    2) "key002"
+    127.0.0.1:6379> msetnx key003 003 key004 004
+    (integer) 1
+    127.0.0.1:6379> keys *
+    1) "key004"
+    2) "key003"
+    3) "key001"
+    4) "key002"
+    ```
+- SETEX key seconds value 将值 value 关联到 key ，并将 key 的过期时间设为 seconds (以秒为单位)
+- SETNX key value 只有在 key 不存在时设置 key 的值
+- SETRANGE key offset value 用 value 参数覆写给定 key 所储存的字符串值，从偏移量 offset 开始
+- STRLEN key 返回 key 所储存的字符串值的长度
+- PSETEX key milliseconds value 这个命令和 SETEX 命令相似，但它以毫秒为单位设置 key 的生存时间，而不是像 SETEX 命令那样，以秒为单位
+- INCR key 将 key 中储存的数字值增一
+- INCRBY key increment 将 key 所储存的值加上给定的增量值（increment）
+- INCRBYFLOAT key increment 将 key 所储存的值加上给定的浮点增量值（increment）
+- DECR key 将 key 中储存的数字值减一
+- DECRBY key decrement   key 所储存的值减去给定的减量值（decrement）
+- APPEND key value 如果 key 已经存在并且是一个字符串， APPEND 命令将指定的 value 追加到该 key 原来值（value）的末尾
+
+
+#### reference
