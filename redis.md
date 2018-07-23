@@ -168,6 +168,8 @@ PONG
 
 ### Redis命令
 #### Redis keys 命令
+<style>table th:first-of-type { width: 30px;}</style>
+<style>table th:nth-of-type(2) { width: 200px;}</style>
 |序号|命令|描述|
 |:------|:------|:------|
 |1|DEL key|该命令用于在 key 存在时删除 key，返回被删除 key 的数量|
