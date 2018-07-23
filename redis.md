@@ -1,6 +1,7 @@
 Redis
 <!-- TOC -->
 
+- [Redis 官网](#redis-%E5%AE%98%E7%BD%91)
 - [Redis 概况](#redis-%E6%A6%82%E5%86%B5)
     - [Redis 是什么？](#redis-%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F)
     - [Redis 数据结构](#redis-%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84)
@@ -20,7 +21,11 @@ Redis
     - [reference](#reference)
 
 <!-- /TOC -->
-
+### Redis 官网
+Redis is an in-memory database that persists on disk. The data model is key-value, but many different kind of values are supported: Strings, Lists, Sets, Sorted Sets, Hashes, HyperLogLogs, Bitmaps. 
+- http://redis.io
+- http://www.redis.cn
+- https://github.com/antirez/redis
 ### Redis 概况
 
 #### Redis 是什么？
@@ -256,3 +261,5 @@ PONG
 
 
 #### reference
+- [http://www.redis.cn/commands](http://www.redis.cn/commands)
+- [Redis 字符串命令](http://www.runoob.com/redis/redis-strings.html)
