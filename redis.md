@@ -18,6 +18,7 @@ Redis
 - [Redis命令](#redis%E5%91%BD%E4%BB%A4)
     - [Redis keys 命令](#redis-keys-%E5%91%BD%E4%BB%A4)
     - [Redis 字符串命令](#redis-%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%91%BD%E4%BB%A4)
+    - [Redis hash 命令](#redis-hash-%E5%91%BD%E4%BB%A4)
     - [reference](#reference)
 
 <!-- /TOC -->
@@ -249,19 +250,93 @@ PONG
     3) "key001"
     4) "key002"
     ```
-- SETEX key seconds value 将值 value 关联到 key ，并将 key 的过期时间设为 seconds (以秒为单位)
 - SETNX key value 只有在 key 不存在时设置 key 的值
+- SETEX key seconds value 将值 value 关联到 key ，并将 key 的过期时间设为 seconds (以秒为单位)
 - SETRANGE key offset value 用 value 参数覆写给定 key 所储存的字符串值，从偏移量 offset 开始
 - STRLEN key 返回 key 所储存的字符串值的长度
 - PSETEX key milliseconds value 这个命令和 SETEX 命令相似，但它以毫秒为单位设置 key 的生存时间，而不是像 SETEX 命令那样，以秒为单位
+    ```shell
+    redis-S:6379> keys *
+    (empty list or set)
+    redis-S:6379> set key001 001
+    OK
+    redis-S:6379> keys *
+    1) "key001"
+    redis-S:6379> setnx key001 002
+    (integer) 0
+    redis-S:6379> get key001
+    "001"
+    redis-S:6379> setnx key002 002
+    (integer) 1
+    redis-S:6379> keys *
+    1) "key001"
+    2) "key002"
+    redis-S:6379> setex key001 60 001A
+    OK
+    redis-S:6379> ttl key001
+    (integer) 54
+    redis-S:6379> get key001
+    "001A"
+    redis-S:6379> strlen key001
+    (integer) 4
+    redis-S:6379> psetex key002 100000 002A
+    OK
+    redis-S:6379> ttl key002
+    (integer) 89
+    redis-S:6379> get key002
+    "002A"
+    redis-S:6379>
+    ```
 - INCR key 将 key 中储存的数字值增一
 - INCRBY key increment 将 key 所储存的值加上给定的增量值（increment）
 - INCRBYFLOAT key increment 将 key 所储存的值加上给定的浮点增量值（increment）
 - DECR key 将 key 中储存的数字值减一
 - DECRBY key decrement   key 所储存的值减去给定的减量值（decrement）
+    ```shel
+    redis-S:6379> keys *
+    (empty list or set)
+    redis-S:6379> set key001 1
+    OK
+    redis-S:6379> get key001
+    "1"
+    redis-S:6379> incr key001
+    (integer) 2
+    redis-S:6379> incrby key001 3
+    (integer) 5
+    redis-S:6379> incrbyfloat key001 0.9
+    "5.9"
+    redis-S:6379> get key002
+    "1"
+    redis-S:6379> decr key002
+    (integer) 0
+    redis-S:6379> decrby key002 2
+    (integer) -2
+    redis-S:6379>
+    ```
 - APPEND key value 如果 key 已经存在并且是一个字符串， APPEND 命令将指定的 value 追加到该 key 原来值（value）的末尾
-
+    ```shell
+    redis-S:6379> keys *
+    1) "key001"
+    2) "key002"
+    redis-S:6379> get key001
+    "5.9"
+    redis-S:6379> append key001 -xxx
+    (integer) 7
+    redis-S:6379> get key001
+    "5.9-xxx"
+    redis-S:6379> append key003 new-value
+    (integer) 9
+    redis-S:6379> keys *
+    1) "key003"
+    2) "key001"
+    3) "key002"
+    redis-S:6379> get key003
+    "new-value"
+    redis-S:6379>
+    ```
+#### Redis hash 命令
 
 #### reference
 - [http://www.redis.cn/commands](http://www.redis.cn/commands)
 - [Redis 字符串命令](http://www.runoob.com/redis/redis-strings.html)
+- [Redis hash 命令](http://www.runoob.com/redis/redis-hashes.html)
