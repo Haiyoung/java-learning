@@ -195,7 +195,7 @@ PONG
 - GET key 获取指定 key 的值
 - GETRANGE key start end 返回 key 中字符串值的子字符
 - GETSET key value 将给定 key 的值设为 value ，并返回 key 的旧值(old value)
-    ```shell
+    ```python
     127.0.0.1:6379> keys *
     (empty list or set)
     127.0.0.1:6379> set key001 001
@@ -211,7 +211,7 @@ PONG
     ```
 - SETBIT key offset value 对 key 所储存的字符串值，设置或清除指定偏移量上的位(bit)
 - GETBIT key offset 对 key 所储存的字符串值，获取指定偏移量上的位(bit)
-    ```shell
+    ```python
     127.0.0.1:6379> keys *
     1) "key001"
     127.0.0.1:6379> setbit key001 3 1
@@ -226,7 +226,7 @@ PONG
 - MSET key value [key value ...] 同时设置一个或多个 key-value 对
 - MSETNX key value [key value ...] 同时设置一个或多个 key-value 对，当且仅当所有给定 key 都不存在
 - MGET key1 [key2..] 获取所有(一个或多个)给定 key 的值
-    ```shell
+    ```python
     127.0.0.1:6379> keys *
     (empty list or set)
     127.0.0.1:6379> mset key001 001 key002 002
@@ -255,7 +255,7 @@ PONG
 - SETRANGE key offset value 用 value 参数覆写给定 key 所储存的字符串值，从偏移量 offset 开始
 - STRLEN key 返回 key 所储存的字符串值的长度
 - PSETEX key milliseconds value 这个命令和 SETEX 命令相似，但它以毫秒为单位设置 key 的生存时间，而不是像 SETEX 命令那样，以秒为单位
-    ```shell
+    ```python
     redis-S:6379> keys *
     (empty list or set)
     redis-S:6379> set key001 001
@@ -292,7 +292,7 @@ PONG
 - INCRBYFLOAT key increment 将 key 所储存的值加上给定的浮点增量值（increment）
 - DECR key 将 key 中储存的数字值减一
 - DECRBY key decrement   key 所储存的值减去给定的减量值（decrement）
-    ```shel
+    ```python
     redis-S:6379> keys *
     (empty list or set)
     redis-S:6379> set key001 1
@@ -314,7 +314,7 @@ PONG
     redis-S:6379>
     ```
 - APPEND key value 如果 key 已经存在并且是一个字符串， APPEND 命令将指定的 value 追加到该 key 原来值（value）的末尾
-    ```shell
+    ```python
     redis-S:6379> keys *
     1) "key001"
     2) "key002"
