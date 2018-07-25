@@ -19,6 +19,7 @@ Redis
     - [Redis keys 命令](#redis-keys-%E5%91%BD%E4%BB%A4)
     - [Redis 字符串命令](#redis-%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%91%BD%E4%BB%A4)
     - [Redis hash 命令](#redis-hash-%E5%91%BD%E4%BB%A4)
+    - [Redis list 命令](#redis-list-%E5%91%BD%E4%BB%A4)
     - [reference](#reference)
 
 <!-- /TOC -->
@@ -336,7 +337,139 @@ PONG
     ```
 #### Redis hash 命令
 
+- HSET key field value 将哈希表 key 中的字段 field 的值设为 value
+- HGET key field 获取存储在哈希表中指定字段的值
+- HMSET key field1 value1 [field2 value2 ] 同时将多个 field-value (域-值)对设置到哈希表 key 中
+- HGETALL key 获取在哈希表中指定 key 的所有字段和值
+- HSETNX key field value 只有在字段 field 不存在时，设置哈希表字段的值
+- HKEYS key 获取所有哈希表中的字段
+- HVALS key 获取哈希表中所有值
+    ```python
+    redis-S:6379> hset hashTest id dog
+    (integer) 1
+    redis-S:6379> hget hashTest id
+    "dog"
+    redis-S:6379> hmset hashTest name dog_1 food bond_1
+    OK
+    redis-S:6379> hgetall hashTest
+    1) "id"
+    2) "dog"
+    3) "name"
+    4) "dog_1"
+    5) "food"
+    6) "bond_1"
+    redis-S:6379> hsetnx hashTest id cat
+    (integer) 0
+    redis-S:6379> hgetall hashTest
+    1) "id"
+    2) "dog"
+    3) "name"
+    4) "dog_1"
+    5) "food"
+    6) "bond_1"
+    redis-S:6379> hkeys hashTest
+    1) "id"
+    2) "name"
+    3) "food"
+    redis-S:6379> hvals hashTest
+    1) "dog"
+    2) "dog_1"
+    3) "bond_1"
+    redis-S:6379>
+    ```
+- HLEN key 获取哈希表中字段的数量
+- HDEL key field1 [field2] 删除一个或多个哈希表字段
+- HEXISTS key field 查看哈希表 key 中，指定的字段是否存在
+- HMGET key field1 [field2] 获取所有给定字段的值
+    ```python
+    redis-S:6379> keys *
+    1) "hashTest"
+    redis-S:6379> hlen hashTest
+    (integer) 3
+    redis-S:6379> hdel hashTest id
+    (integer) 1
+    redis-S:6379> hlen hashTest
+    (integer) 2
+    redis-S:6379> hgetall hashTest
+    1) "name"
+    2) "dog_1"
+    3) "food"
+    4) "bond_1"
+    redis-S:6379> hexists hashTest id
+    (integer) 0
+    redis-S:6379> hexists hashTest name
+    (integer) 1
+    redis-S:6379> hmget hashTest name food
+    1) "dog_1"
+    2) "bond_1"
+    redis-S:6379>
+    ```
+- HINCRBY key field increment 为哈希表 key 中的指定字段的整数值加上增量 increment 
+- HINCRBYFLOAT key field increment 为哈希表 key 中的指定字段的浮点数值加上增量 increment 
+    ```python
+    redis-S:6379> keys *
+    1) "hashTest"
+    redis-S:6379> hmset hashTest002 f1 1 f2 2 f3 3
+    OK
+    redis-S:6379> hgetall hashTest002
+    1) "f1"
+    2) "1"
+    3) "f2"
+    4) "2"
+    5) "f3"
+    6) "3"
+    redis-S:6379> hincrby hashTest002 f3 2
+    (integer) 5
+    redis-S:6379> hincrbyfloat hashTest002 f1 1.1
+    "2.1"
+    ```
+- HSCAN key cursor [MATCH pattern] [COUNT count] 迭代哈希表中的键值对
+    ```python
+    #SCAN 命令是一个基于游标的迭代器（cursor based iterator）： SCAN 命令每次被调用之后， 都会向用户返回一个新的游标， 用户在下次迭代时需要使用这个新游标作为 SCAN 命令的游标参数， 以此来延续之前的迭代过程。
+    #当 SCAN 命令的游标参数被设置为 0 时， 服务器将开始一次新的迭代， 而当服务器向用户返回值为 0 的游标时， 表示迭代已结束
+    # match 可以返回匹配的键值对
+    # COUNT 选项的作用就是让用户告知迭代命令， 在每次迭代中应该从数据集里返回多少元素
+    # 虽然 COUNT 选项只是对增量式迭代命令的一种提示（hint），但是在大多数情况下， 这种提示都是有效的（数据量少时不生效）
+    redis-S:6379> hscan hashTest002 0
+    1) "0"
+    2) 1) "f1"
+    2) "2.1"
+    3) "f2"
+    4) "2"
+    5) "f3"
+    6) "5"
+    redis-S:6379> hscan hashTest002 0 match *2
+    1) "0"
+    2) 1) "f2"
+    2) "2"
+    redis-S:6379> hscan hashTest002 0 match *2 count 3
+    1) "0"
+    2) 1) "f2"
+    2) "2"
+    redis-S:6379>
+    ```
+
+#### Redis list 命令
+- BLPOP key1 [key2 ] timeout 移出并获取列表的第一个元素， 如果列表没有元素会阻塞列表直到等待超时或发现可弹出元素为止
+- BRPOP key1 [key2 ] timeout 移出并获取列表的最后一个元素， 如果列表没有元素会阻塞列表直到等待超时或发现可弹出元素为止
+- BRPOPLPUSH source destination timeout 从列表中弹出一个值，将弹出的元素插入到另外一个列表中并返回它； 如果列表没有元素会阻塞列表直到等待超时或发现可弹出元素为止
+- LINDEX key index 通过索引获取列表中的元素
+- LINSERT key BEFORE|AFTER pivot value 在列表的元素前或者后插入元素
+- LLEN key 获取列表长度
+- LPOP key 移出并获取列表的第一个元素
+- LPUSH key value1 [value2] 将一个或多个值插入到列表头部
+- LPUSHX key value 将一个值插入到已存在的列表头部
+- LRANGE key start stop 获取列表指定范围内的元素
+- LREM key count value 移除列表元素
+- LSET key index value 通过索引设置列表元素的值
+- LTRIM key start stop 对一个列表进行修剪(trim)，就是说，让列表只保留指定区间内的元素，不在指定区间之内的元素都将被删除
+- RPOP key 移除并获取列表最后一个元素
+- RPOPLPUSH source destination 移除列表的最后一个元素，并将该元素添加到另一个列表并返回
+- RPUSH key value1 [value2] 在列表中添加一个或多个值
+- RPUSHX key value 为已存在的列表添加值
+
 #### reference
 - [http://www.redis.cn/commands](http://www.redis.cn/commands)
 - [Redis 字符串命令](http://www.runoob.com/redis/redis-strings.html)
 - [Redis hash 命令](http://www.runoob.com/redis/redis-hashes.html)
+- [Redis list 命令](http://www.runoob.com/redis/redis-lists.html)
