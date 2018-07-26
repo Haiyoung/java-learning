@@ -1,29 +1,29 @@
 Redis
 <!-- TOC -->
 
-- [Redis 官网](#redis-官网)
-- [Redis 概况](#redis-概况)
-    - [Redis 是什么？](#redis-是什么)
-    - [Redis 数据结构](#redis-数据结构)
-        - [value 对应的五种数据结构](#value-对应的五种数据结构)
-        - [Redis 核心对象 redisObject](#redis-核心对象-redisobject)
-            - [编码方式（encoding）](#编码方式encoding)
-        - [Redis 五种数据结构对应的内部编码](#redis-五种数据结构对应的内部编码)
+- [Redis 官网](#redis-%E5%AE%98%E7%BD%91)
+- [Redis 概况](#redis-%E6%A6%82%E5%86%B5)
+    - [Redis 是什么？](#redis-%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F)
+    - [Redis 数据结构](#redis-%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84)
+        - [value 对应的五种数据结构](#value-%E5%AF%B9%E5%BA%94%E7%9A%84%E4%BA%94%E7%A7%8D%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84)
+        - [Redis 核心对象 redisObject](#redis-%E6%A0%B8%E5%BF%83%E5%AF%B9%E8%B1%A1-redisobject)
+            - [编码方式（encoding）](#%E7%BC%96%E7%A0%81%E6%96%B9%E5%BC%8F%EF%BC%88encoding%EF%BC%89)
+        - [Redis 五种数据结构对应的内部编码](#redis-%E4%BA%94%E7%A7%8D%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%AF%B9%E5%BA%94%E7%9A%84%E5%86%85%E9%83%A8%E7%BC%96%E7%A0%81)
     - [reference](#reference)
-- [搭建 Redis 环境](#搭建-redis-环境)
-    - [启动 redis server](#启动-redis-server)
-    - [启动 redis-cli](#启动-redis-cli)
-    - [redis-cli连接远程服务](#redis-cli连接远程服务)
-    - [reference](#reference-1)
-- [Redis命令](#redis命令)
-    - [Redis keys 命令](#redis-keys-命令)
-    - [Redis 字符串命令](#redis-字符串命令)
-    - [Redis hash 命令](#redis-hash-命令)
-    - [Redis list 命令](#redis-list-命令)
-    - [Redis set 命令](#redis-set-命令)
-    - [Redis sorted set 命令](#redis-sorted-set-命令)
-    - [Redis HyperLogLog 命令](#redis-hyperloglog-命令)
-    - [reference](#reference-2)
+- [搭建 Redis 环境](#%E6%90%AD%E5%BB%BA-redis-%E7%8E%AF%E5%A2%83)
+    - [启动 redis server](#%E5%90%AF%E5%8A%A8-redis-server)
+    - [启动 redis-cli](#%E5%90%AF%E5%8A%A8-redis-cli)
+    - [redis-cli连接远程服务](#redis-cli%E8%BF%9E%E6%8E%A5%E8%BF%9C%E7%A8%8B%E6%9C%8D%E5%8A%A1)
+    - [reference](#reference)
+- [Redis命令](#redis%E5%91%BD%E4%BB%A4)
+    - [Redis keys 命令](#redis-keys-%E5%91%BD%E4%BB%A4)
+    - [Redis 字符串命令](#redis-%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%91%BD%E4%BB%A4)
+    - [Redis hash 命令](#redis-hash-%E5%91%BD%E4%BB%A4)
+    - [Redis list 命令](#redis-list-%E5%91%BD%E4%BB%A4)
+    - [Redis set 命令](#redis-set-%E5%91%BD%E4%BB%A4)
+    - [Redis sorted set 命令](#redis-sorted-set-%E5%91%BD%E4%BB%A4)
+    - [Redis HyperLogLog 命令](#redis-hyperloglog-%E5%91%BD%E4%BB%A4)
+    - [reference](#reference)
 
 <!-- /TOC -->
 ### Redis 官网
@@ -453,23 +453,149 @@ PONG
     ```
 
 #### Redis list 命令
-- BLPOP key1 [key2 ] timeout 移出并获取列表的第一个元素， 如果列表没有元素会阻塞列表直到等待超时或发现可弹出元素为止
-- BRPOP key1 [key2 ] timeout 移出并获取列表的最后一个元素， 如果列表没有元素会阻塞列表直到等待超时或发现可弹出元素为止
-- BRPOPLPUSH source destination timeout 从列表中弹出一个值，将弹出的元素插入到另外一个列表中并返回它； 如果列表没有元素会阻塞列表直到等待超时或发现可弹出元素为止
-- LINDEX key index 通过索引获取列表中的元素
-- LINSERT key BEFORE|AFTER pivot value 在列表的元素前或者后插入元素
-- LLEN key 获取列表长度
-- LPOP key 移出并获取列表的第一个元素
+- RPUSH key value1 [value2] 在列表中添加一个或多个值
 - LPUSH key value1 [value2] 将一个或多个值插入到列表头部
-- LPUSHX key value 将一个值插入到已存在的列表头部
 - LRANGE key start stop 获取列表指定范围内的元素
+- LPOP key 移除并获取列表的第一个元素
+- RPOP key 移除并获取列表最后一个元素
+- LPUSHX key value 将一个值插入到已存在的列表头部
+- RPUSHX key value 为已存在的列表添加值
+- LLEN key 获取列表长度
+    ```python
+    redis-S:6379> keys *
+    (empty list or set)
+    redis-S:6379> rpush listTest 001
+    (integer) 1
+    redis-S:6379> lrange listTest 0 -1
+    1) "001"
+    redis-S:6379> lpush listTest 002
+    (integer) 2
+    redis-S:6379> lrange listTest 0 -1
+    1) "002"
+    2) "001"
+    redis-S:6379> lpop listTest
+    "002"
+    redis-S:6379> rpop listTest
+    "001"
+    redis-S:6379> lrange listTest 0 -1
+    (empty list or set)
+    redis-S:6379> keys *
+    (empty list or set)
+    redis-S:6379> lpushx listTest 003
+    (integer) 0
+    redis-S:6379> rpush listTest 001
+    (integer) 1
+    redis-S:6379> lpushx listTest 003
+    (integer) 2
+    redis-S:6379> lrange listTest 0 -1
+    1) "003"
+    2) "001"
+    redis-S:6379> rpushx listTest 004
+    (integer) 3
+    redis-S:6379> lrange listTest 0 -1
+    1) "003"
+    2) "001"
+    3) "004"
+    redis-S:6379> llen listTest
+    (integer) 3
+    redis-S:6379>
+    ```
+- LINSERT key BEFORE|AFTER pivot value 在列表的元素前或者后插入元素(如果命令执行成功，返回插入操作完成之后，列表的长度。 如果没有找到指定元素 ，返回 -1 。 如果 key 不存在或为空列表，返回 0)
+- LINDEX key index 通过索引获取列表中的元素
+    ```python
+    redis-S:6379> lrange listTest 0 -1
+    1) "003"
+    2) "001"
+    3) "004"
+    redis-S:6379> lindex listTest 1
+    "001"
+    redis-S:6379> linsert listTest before "001" "009"
+    (integer) 4
+    redis-S:6379> lrange listTest 0 -1
+    1) "003"
+    2) "009"
+    3) "001"
+    4) "004"
+    redis-S:6379> linsert listTest after "001" "006"
+    (integer) 5
+    redis-S:6379> lrange listTest 0 -1
+    1) "003"
+    2) "009"
+    3) "001"
+    4) "006"
+    5) "004"
+    redis-S:6379>
+    ```
 - LREM key count value 移除列表元素
+    - Redis Lrem 根据参数 COUNT 的值，移除列表中与参数 VALUE 相等的元素
+    - count > 0 : 从表头开始向表尾搜索，移除与 VALUE 相等的元素，数量为 COUNT 
+    - count < 0 : 从表尾开始向表头搜索，移除与 VALUE 相等的元素，数量为 COUNT 的绝对值
+    - scount = 0 : 移除表中所有与 VALUE 相等的值
+    ```python
+    redis-S:6379> lrange listTest 0 -1
+    1) "003"
+    2) "009"
+    3) "001"
+    4) "006"
+    5) "004"
+    6) "003"
+    7) "003"
+    8) "001"
+    9) "001"
+    10) "003"
+    redis-S:6379> lrem listTest 2 003
+    (integer) 2
+    redis-S:6379> lrange listTest 0 -1
+    1) "009"
+    2) "001"
+    3) "006"
+    4) "004"
+    5) "003"
+    6) "001"
+    7) "001"
+    8) "003"
+    redis-S:6379> lrem listTest 2 003
+    (integer) 2
+    redis-S:6379> lrange listTest 0 -1
+    1) "009"
+    2) "001"
+    3) "006"
+    4) "004"
+    5) "001"
+    6) "001"
+    redis-S:6379> lrem listTest 0 001
+    (integer) 3
+    redis-S:6379> lrange listTest 0 -1
+    1) "009"
+    2) "006"
+    3) "004"
+    redis-S:6379>
+    ```
 - LSET key index value 通过索引设置列表元素的值
 - LTRIM key start stop 对一个列表进行修剪(trim)，就是说，让列表只保留指定区间内的元素，不在指定区间之内的元素都将被删除
-- RPOP key 移除并获取列表最后一个元素
+    ```python
+    redis-S:6379> lrange listTest 0 -1
+    1) "009"
+    2) "006"
+    3) "004"
+    redis-S:6379> lset listTest 1 008
+    OK
+    redis-S:6379> lrange listTest 0 -1
+    1) "009"
+    2) "008"
+    3) "004"
+    redis-S:6379> ltrim listTest 1 -1
+    OK
+    redis-S:6379> lrange listTest 0 -1
+    1) "008"
+    2) "004"
+    redis-S:6379>
+    ```
+- BLPOP key1 [key2 ] timeout 移出并获取列表的第一个元素， 如果列表没有元素会阻塞列表直到等待超时或发现可弹出元素为止
+- BRPOP key1 [key2 ] timeout 移出并获取列表的最后一个元素， 如果列表没有元素会阻塞列表直到等待超时或发现可弹出元素为止
 - RPOPLPUSH source destination 移除列表的最后一个元素，并将该元素添加到另一个列表并返回
-- RPUSH key value1 [value2] 在列表中添加一个或多个值
-- RPUSHX key value 为已存在的列表添加值
+- BRPOPLPUSH source destination timeout 从列表中弹出一个值，将弹出的元素插入到另外一个列表中并返回它； 如果列表没有元素会阻塞列表直到等待超时或发现可弹出元素为止
+![Redis list commond](/imgs/redis/list_commond.png)
 
 #### Redis set 命令
 - SADD key member1 [member2] 向集合添加一个或多个成员
