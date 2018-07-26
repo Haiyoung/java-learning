@@ -1,26 +1,29 @@
 Redis
 <!-- TOC -->
 
-- [Redis 官网](#redis-%E5%AE%98%E7%BD%91)
-- [Redis 概况](#redis-%E6%A6%82%E5%86%B5)
-    - [Redis 是什么？](#redis-%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F)
-    - [Redis 数据结构](#redis-%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84)
-        - [value 对应的五种数据结构](#value-%E5%AF%B9%E5%BA%94%E7%9A%84%E4%BA%94%E7%A7%8D%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84)
-        - [Redis 核心对象 redisObject](#redis-%E6%A0%B8%E5%BF%83%E5%AF%B9%E8%B1%A1-redisobject)
-            - [编码方式（encoding）](#%E7%BC%96%E7%A0%81%E6%96%B9%E5%BC%8F%EF%BC%88encoding%EF%BC%89)
-        - [Redis 五种数据结构对应的内部编码](#redis-%E4%BA%94%E7%A7%8D%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%AF%B9%E5%BA%94%E7%9A%84%E5%86%85%E9%83%A8%E7%BC%96%E7%A0%81)
+- [Redis 官网](#redis-官网)
+- [Redis 概况](#redis-概况)
+    - [Redis 是什么？](#redis-是什么)
+    - [Redis 数据结构](#redis-数据结构)
+        - [value 对应的五种数据结构](#value-对应的五种数据结构)
+        - [Redis 核心对象 redisObject](#redis-核心对象-redisobject)
+            - [编码方式（encoding）](#编码方式encoding)
+        - [Redis 五种数据结构对应的内部编码](#redis-五种数据结构对应的内部编码)
     - [reference](#reference)
-- [搭建 Redis 环境](#%E6%90%AD%E5%BB%BA-redis-%E7%8E%AF%E5%A2%83)
-    - [启动 redis server](#%E5%90%AF%E5%8A%A8-redis-server)
-    - [启动 redis-cli](#%E5%90%AF%E5%8A%A8-redis-cli)
-    - [redis-cli连接远程服务](#redis-cli%E8%BF%9E%E6%8E%A5%E8%BF%9C%E7%A8%8B%E6%9C%8D%E5%8A%A1)
-    - [reference](#reference)
-- [Redis命令](#redis%E5%91%BD%E4%BB%A4)
-    - [Redis keys 命令](#redis-keys-%E5%91%BD%E4%BB%A4)
-    - [Redis 字符串命令](#redis-%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%91%BD%E4%BB%A4)
-    - [Redis hash 命令](#redis-hash-%E5%91%BD%E4%BB%A4)
-    - [Redis list 命令](#redis-list-%E5%91%BD%E4%BB%A4)
-    - [reference](#reference)
+- [搭建 Redis 环境](#搭建-redis-环境)
+    - [启动 redis server](#启动-redis-server)
+    - [启动 redis-cli](#启动-redis-cli)
+    - [redis-cli连接远程服务](#redis-cli连接远程服务)
+    - [reference](#reference-1)
+- [Redis命令](#redis命令)
+    - [Redis keys 命令](#redis-keys-命令)
+    - [Redis 字符串命令](#redis-字符串命令)
+    - [Redis hash 命令](#redis-hash-命令)
+    - [Redis list 命令](#redis-list-命令)
+    - [Redis set 命令](#redis-set-命令)
+    - [Redis sorted set 命令](#redis-sorted-set-命令)
+    - [Redis HyperLogLog 命令](#redis-hyperloglog-命令)
+    - [reference](#reference-2)
 
 <!-- /TOC -->
 ### Redis 官网
@@ -468,8 +471,55 @@ PONG
 - RPUSH key value1 [value2] 在列表中添加一个或多个值
 - RPUSHX key value 为已存在的列表添加值
 
+#### Redis set 命令
+- SADD key member1 [member2] 向集合添加一个或多个成员
+- SCARD key 获取集合的成员数
+- SDIFF key1 [key2] 返回给定所有集合的差集
+- SDIFFSTORE destination key1 [key2] 返回给定所有集合的差集并存储在 destination 中
+- SINTER key1 [key2] 返回给定所有集合的交集
+- SINTERSTORE destination key1 [key2] 返回给定所有集合的交集并存储在 destination 中
+- SISMEMBER key member 判断 member 元素是否是集合 key 的成员
+- SMEMBERS key 返回集合中的所有成员
+- SMOVE source destination member 将 member 元素从 source 集合移动到 destination 集合
+- SPOP key 移除并返回集合中的一个随机元素
+- SRANDMEMBER key [count] 返回集合中一个或多个随机数
+- SREM key member1 [member2] 移除集合中一个或多个成员
+- SUNION key1 [key2] 返回所有给定集合的并集
+- SUNIONSTORE destination key1 [key2] 所有给定集合的并集存储在 destination 集合中
+- SSCAN key cursor [MATCH pattern] [COUNT count] 迭代集合中的元素
+
+#### Redis sorted set 命令
+- ZADD key score1 member1 [score2 member2] 向有序集合添加一个或多个成员，或者更新已存在成员的分数
+- ZCARD key 获取有序集合的成员数
+- ZCOUNT key min max 计算在有序集合中指定区间分数的成员数
+- ZINCRBY key increment member 有序集合中对指定成员的分数加上增量 increment
+- ZINTERSTORE destination numkeys key [key ...] 计算给定的一个或多个有序集的交集并将结果集存储在新的有序集合 key 中
+- ZLEXCOUNT key min max 在有序集合中计算指定字典区间内成员数量
+- ZRANGE key start stop [WITHSCORES] 通过索引区间返回有序集合成指定区间内的成员
+- ZRANGEBYLEX key min max [LIMIT offset count] 通过字典区间返回有序集合的成员
+- ZRANGEBYSCORE key min max [WITHSCORES] [LIMIT] 通过分数返回有序集合指定区间内的成员
+- ZRANK key member 返回有序集合中指定成员的索引
+- ZREM key member [member ...] 移除有序集合中的一个或多个成员
+- ZREMRANGEBYLEX key min max 移除有序集合中给定的字典区间的所有成员
+- ZREMRANGEBYRANK key start stop 移除有序集合中给定的排名区间的所有成员
+- ZREMRANGEBYSCORE key min max 移除有序集合中给定的分数区间的所有成员
+- ZREVRANGE key start stop [WITHSCORES] 返回有序集中指定区间内的成员，通过索引，分数从高到底
+- ZREVRANGEBYSCORE key max min [WITHSCORES] 返回有序集中指定分数区间内的成员，分数从高到低排序
+- ZREVRANK key member 返回有序集合中指定成员的排名，有序集成员按分数值递减(从大到小)排序
+- ZSCORE key member 返回有序集中，成员的分数值
+- ZUNIONSTORE destination numkeys key [key ...] 计算给定的一个或多个有序集的并集，并存储在新的 key 中
+- ZSCAN key cursor [MATCH pattern] [COUNT count] 迭代有序集合中的元素（包括元素成员和元素分值）
+
+#### Redis HyperLogLog 命令
+- PFADD key element [element ...] 添加指定元素到 HyperLogLog 中
+- PFCOUNT key [key ...] 返回给定 HyperLogLog 的基数估算值
+- PFMERGE destkey sourcekey [sourcekey ...] 将多个 HyperLogLog 合并为一个 HyperLogLog
+
 #### reference
 - [http://www.redis.cn/commands](http://www.redis.cn/commands)
 - [Redis 字符串命令](http://www.runoob.com/redis/redis-strings.html)
 - [Redis hash 命令](http://www.runoob.com/redis/redis-hashes.html)
 - [Redis list 命令](http://www.runoob.com/redis/redis-lists.html)
+- [Redis set 命令](http://www.runoob.com/redis/redis-sets.html)
+- [Redis zset 命令](http://www.runoob.com/redis/redis-sorted-sets.html)
+- [Redis HyperLogLog 命令](http://www.runoob.com/redis/redis-hyperloglog.html)
