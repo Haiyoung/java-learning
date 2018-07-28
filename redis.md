@@ -199,7 +199,7 @@ PONG
 - GET key 获取指定 key 的值
 - GETRANGE key start end 返回 key 中字符串值的子字符
 - GETSET key value 将给定 key 的值设为 value ，并返回 key 的旧值(old value)
-    ```python
+    ```java
     127.0.0.1:6379> keys *
     (empty list or set)
     127.0.0.1:6379> set key001 001
@@ -215,7 +215,7 @@ PONG
     ```
 - SETBIT key offset value 对 key 所储存的字符串值，设置或清除指定偏移量上的位(bit)
 - GETBIT key offset 对 key 所储存的字符串值，获取指定偏移量上的位(bit)
-    ```python
+    ```java
     127.0.0.1:6379> keys *
     1) "key001"
     127.0.0.1:6379> setbit key001 3 1
@@ -230,7 +230,7 @@ PONG
 - MSET key value [key value ...] 同时设置一个或多个 key-value 对
 - MSETNX key value [key value ...] 同时设置一个或多个 key-value 对，当且仅当所有给定 key 都不存在
 - MGET key1 [key2..] 获取所有(一个或多个)给定 key 的值
-    ```python
+    ```java
     127.0.0.1:6379> keys *
     (empty list or set)
     127.0.0.1:6379> mset key001 001 key002 002
@@ -259,7 +259,7 @@ PONG
 - SETRANGE key offset value 用 value 参数覆写给定 key 所储存的字符串值，从偏移量 offset 开始
 - STRLEN key 返回 key 所储存的字符串值的长度
 - PSETEX key milliseconds value 这个命令和 SETEX 命令相似，但它以毫秒为单位设置 key 的生存时间，而不是像 SETEX 命令那样，以秒为单位
-    ```python
+    ```java
     redis-S:6379> keys *
     (empty list or set)
     redis-S:6379> set key001 001
@@ -296,7 +296,7 @@ PONG
 - INCRBYFLOAT key increment 将 key 所储存的值加上给定的浮点增量值（increment）
 - DECR key 将 key 中储存的数字值减一
 - DECRBY key decrement   key 所储存的值减去给定的减量值（decrement）
-    ```python
+    ```java
     redis-S:6379> keys *
     (empty list or set)
     redis-S:6379> set key001 1
@@ -318,7 +318,7 @@ PONG
     redis-S:6379>
     ```
 - APPEND key value 如果 key 已经存在并且是一个字符串， APPEND 命令将指定的 value 追加到该 key 原来值（value）的末尾
-    ```python
+    ```java
     redis-S:6379> keys *
     1) "key001"
     2) "key002"
@@ -347,7 +347,7 @@ PONG
 - HSETNX key field value 只有在字段 field 不存在时，设置哈希表字段的值
 - HKEYS key 获取所有哈希表中的字段
 - HVALS key 获取哈希表中所有值
-    ```python
+    ```java
     redis-S:6379> hset hashTest id dog
     (integer) 1
     redis-S:6379> hget hashTest id
@@ -384,7 +384,7 @@ PONG
 - HDEL key field1 [field2] 删除一个或多个哈希表字段
 - HEXISTS key field 查看哈希表 key 中，指定的字段是否存在
 - HMGET key field1 [field2] 获取所有给定字段的值
-    ```python
+    ```java
     redis-S:6379> keys *
     1) "hashTest"
     redis-S:6379> hlen hashTest
@@ -409,7 +409,7 @@ PONG
     ```
 - HINCRBY key field increment 为哈希表 key 中的指定字段的整数值加上增量 increment 
 - HINCRBYFLOAT key field increment 为哈希表 key 中的指定字段的浮点数值加上增量 increment 
-    ```python
+    ```java
     redis-S:6379> keys *
     1) "hashTest"
     redis-S:6379> hmset hashTest002 f1 1 f2 2 f3 3
@@ -427,7 +427,7 @@ PONG
     "2.1"
     ```
 - HSCAN key cursor [MATCH pattern] [COUNT count] 迭代哈希表中的键值对
-    ```python
+    ```java
     #SCAN 命令是一个基于游标的迭代器（cursor based iterator）： SCAN 命令每次被调用之后， 都会向用户返回一个新的游标， 用户在下次迭代时需要使用这个新游标作为 SCAN 命令的游标参数， 以此来延续之前的迭代过程。
     #当 SCAN 命令的游标参数被设置为 0 时， 服务器将开始一次新的迭代， 而当服务器向用户返回值为 0 的游标时， 表示迭代已结束
     # match 可以返回匹配的键值对
@@ -461,7 +461,7 @@ PONG
 - LPUSHX key value 将一个值插入到已存在的列表头部
 - RPUSHX key value 为已存在的列表添加值
 - LLEN key 获取列表长度
-    ```python
+    ```java
     redis-S:6379> keys *
     (empty list or set)
     redis-S:6379> rpush listTest 001
@@ -502,7 +502,7 @@ PONG
     ```
 - LINSERT key BEFORE|AFTER pivot value 在列表的元素前或者后插入元素(如果命令执行成功，返回插入操作完成之后，列表的长度。 如果没有找到指定元素 ，返回 -1 。 如果 key 不存在或为空列表，返回 0)
 - LINDEX key index 通过索引获取列表中的元素
-    ```python
+    ```java
     redis-S:6379> lrange listTest 0 -1
     1) "003"
     2) "001"
@@ -531,7 +531,7 @@ PONG
     - count > 0 : 从表头开始向表尾搜索，移除与 VALUE 相等的元素，数量为 COUNT 
     - count < 0 : 从表尾开始向表头搜索，移除与 VALUE 相等的元素，数量为 COUNT 的绝对值
     - scount = 0 : 移除表中所有与 VALUE 相等的值
-    ```python
+    ```java
     redis-S:6379> lrange listTest 0 -1
     1) "003"
     2) "009"
@@ -573,7 +573,7 @@ PONG
     ```
 - LSET key index value 通过索引设置列表元素的值
 - LTRIM key start stop 对一个列表进行修剪(trim)，就是说，让列表只保留指定区间内的元素，不在指定区间之内的元素都将被删除
-    ```python
+    ```java
     redis-S:6379> lrange listTest 0 -1
     1) "009"
     2) "006"
