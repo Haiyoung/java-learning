@@ -599,21 +599,199 @@ PONG
 
 #### Redis set 命令
 - SADD key member1 [member2] 向集合添加一个或多个成员
-- SCARD key 获取集合的成员数
-- SDIFF key1 [key2] 返回给定所有集合的差集
-- SDIFFSTORE destination key1 [key2] 返回给定所有集合的差集并存储在 destination 中
-- SINTER key1 [key2] 返回给定所有集合的交集
-- SINTERSTORE destination key1 [key2] 返回给定所有集合的交集并存储在 destination 中
-- SISMEMBER key member 判断 member 元素是否是集合 key 的成员
 - SMEMBERS key 返回集合中的所有成员
-- SMOVE source destination member 将 member 元素从 source 集合移动到 destination 集合
+- SREM key member1 [member2] 移除集合中一个或多个成员
+- SISMEMBER key member 判断 member 元素是否是集合 key 的成员
+    ```java
+    redis-S:6379> keys *
+    (empty list or set)
+    redis-S:6379> sadd setTest 001 002 003
+    (integer) 3
+    redis-S:6379> smembers setTest
+    1) "003"
+    2) "002"
+    3) "001"
+    redis-S:6379> srem setTest 001
+    (integer) 1
+    redis-S:6379> smembers setTest
+    1) "003"
+    2) "002"
+    redis-S:6379> sismember setTest 002
+    (integer) 1
+    redis-S:6379> sismember setTest 005
+    (integer) 0
+    redis-S:6379>
+    ```
 - SPOP key 移除并返回集合中的一个随机元素
 - SRANDMEMBER key [count] 返回集合中一个或多个随机数
-- SREM key member1 [member2] 移除集合中一个或多个成员
+- SCARD key 获取集合的成员数
+    ```java
+    redis-S:6379> keys *
+    1) "setTest"
+    redis-S:6379> smembers setTest
+    1) "003"
+    2) "002"
+    redis-S:6379> sadd setTest 009 007 003
+    (integer) 2
+    redis-S:6379> smembers setTest
+    1) "009"
+    2) "003"
+    3) "002"
+    4) "007"
+    redis-S:6379> spop setTest
+    "009"
+    redis-S:6379> srandmember setTest 2
+    1) "003"
+    2) "007"
+    redis-S:6379> smembers setTest
+    1) "002"
+    2) "003"
+    3) "007"
+    redis-S:6379> scard setTest
+    (integer) 3
+    redis-S:6379>
+    ```
+- SDIFF key1 [key2] 返回给定所有集合的差集
+- SINTER key1 [key2] 返回给定所有集合的交集
 - SUNION key1 [key2] 返回所有给定集合的并集
+    ```java
+    redis-S:6379> keys *
+    1) "setTest002"
+    2) "setTest"
+    redis-S:6379> smembers setTest
+    1) "yyy"
+    2) "002"
+    3) "003"
+    4) "ttt"
+    5) "007"
+    redis-S:6379> smembers setTest002
+    1) "xxx"
+    2) "005"
+    3) "004"
+    4) "009"
+    5) "007"
+    6) "008"
+    7) "006"
+    8) "002"
+    9) "003"
+    10) "001"
+    redis-S:6379> sdiff setTest setTest002
+    1) "yyy"
+    2) "ttt"
+    redis-S:6379> sinter setTest setTest002
+    1) "002"
+    2) "003"
+    3) "007"
+    redis-S:6379> sunion setTest setTest002
+    1) "xxx"
+    2) "005"
+    3) "004"
+    4) "009"
+    5) "007"
+    6) "ttt"
+    7) "008"
+    8) "006"
+    9) "yyy"
+    10) "002"
+    11) "001"
+    12) "003"
+    redis-S:6379>
+    ```
+- SDIFFSTORE destination key1 [key2] 返回给定所有集合的差集并存储在 destination 中
+- SINTERSTORE destination key1 [key2] 返回给定所有集合的交集并存储在 destination 中
 - SUNIONSTORE destination key1 [key2] 所有给定集合的并集存储在 destination 集合中
+    ```java
+    redis-S:6379> keys *
+    1) "setTest002"
+    2) "setTest"
+    redis-S:6379> sdiffstore dest setTest setTest002
+    (integer) 2
+    redis-S:6379> smembers dest
+    1) "yyy"
+    2) "ttt"
+    redis-S:6379> srem dest yyy ttt
+    (integer) 2
+    redis-S:6379> smembers dest
+    (empty list or set)
+    redis-S:6379> sinterstore dest setTest setTest002
+    (integer) 3
+    redis-S:6379> smembers dest
+    1) "003"
+    2) "002"
+    3) "007"
+    redis-S:6379> srem dest 003 002 007
+    (integer) 3
+    redis-S:6379> sunionstore dest setTest setTest002
+    (integer) 12
+    redis-S:6379> smembers dest
+    1) "xxx"
+    2) "005"
+    3) "004"
+    4) "009"
+    5) "007"
+    6) "ttt"
+    7) "008"
+    8) "006"
+    9) "yyy"
+    10) "002"
+    11) "001"
+    12) "003"
+    redis-S:6379>
+    ```
+- SMOVE source destination member 将 member 元素从 source 集合移动到 destination 集合s
 - SSCAN key cursor [MATCH pattern] [COUNT count] 迭代集合中的元素
-
+    ```java
+    redis-S:6379> keys *
+    1) "setTest002"
+    2) "setTest"
+    redis-S:6379> smembers setTest
+    1) "yyy"
+    2) "002"
+    3) "003"
+    4) "ttt"
+    5) "007"
+    redis-S:6379> smembers setTest002
+    1) "xxx"
+    2) "005"
+    3) "004"
+    4) "009"
+    5) "007"
+    6) "008"
+    7) "006"
+    8) "002"
+    9) "003"
+    10) "001"
+    redis-S:6379> smove setTest setTest002 ttt
+    (integer) 1
+    redis-S:6379> smembers setTest
+    1) "yyy"
+    2) "002"
+    3) "003"
+    4) "007"
+    redis-S:6379> smembers setTest002
+    1) "xxx"
+    2) "005"
+    3) "004"
+    4) "009"
+    5) "ttt"
+    6) "007"
+    7) "008"
+    8) "006"
+    9) "002"
+    10) "003"
+    11) "001"
+    redis-S:6379> sscan setTest002 0 match 00* count 9
+    1) "15"
+    2) 1) "006"
+    2) "002"
+    3) "009"
+    4) "003"
+    5) "001"
+    6) "005"
+    7) "004"
+    8) "007"
+    9) "008"
+    ```
 #### Redis sorted set 命令
 - ZADD key score1 member1 [score2 member2] 向有序集合添加一个或多个成员，或者更新已存在成员的分数
 - ZCARD key 获取有序集合的成员数
