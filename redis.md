@@ -795,25 +795,217 @@ PONG
 #### Redis sorted set 命令
 - ZADD key score1 member1 [score2 member2] 向有序集合添加一个或多个成员，或者更新已存在成员的分数
 - ZCARD key 获取有序集合的成员数
+- ZSCORE key member 返回有序集中，成员的分数值
 - ZCOUNT key min max 计算在有序集合中指定区间分数的成员数
 - ZINCRBY key increment member 有序集合中对指定成员的分数加上增量 increment
-- ZINTERSTORE destination numkeys key [key ...] 计算给定的一个或多个有序集的交集并将结果集存储在新的有序集合 key 中
-- ZLEXCOUNT key min max 在有序集合中计算指定字典区间内成员数量
-- ZRANGE key start stop [WITHSCORES] 通过索引区间返回有序集合成指定区间内的成员
-- ZRANGEBYLEX key min max [LIMIT offset count] 通过字典区间返回有序集合的成员
-- ZRANGEBYSCORE key min max [WITHSCORES] [LIMIT] 通过分数返回有序集合指定区间内的成员
 - ZRANK key member 返回有序集合中指定成员的索引
-- ZREM key member [member ...] 移除有序集合中的一个或多个成员
+- ZREM key member [member ...] 移除有序集合中的一个或多个成员s
+- ZRANGE key start stop [WITHSCORES] 通过索引区间返回有序集合成指定区间内的成员
+    ```java
+    redis-S:6379> keys *
+    (empty list or set)
+    redis-S:6379> zadd zsetTest 1 aaa 2 bbb 4 ddd 3 ccc
+    (integer) 4
+    redis-S:6379> zcard zsetTest
+    (integer) 4
+    redis-S:6379> zscore zsetTest aaa
+    "1"
+    redis-S:6379> zcount zsetTest 1 3
+    (integer) 3
+    redis-S:6379> zincrby zsetTest 8 aaa
+    "9"
+    redis-S:6379> zrank zsetTest aaa
+    (integer) 3
+    redis-S:6379> zrem zsetTest ddd
+    (integer) 1
+    redis-S:6379> zrange zsetTest 0 -1
+    1) "bbb"
+    2) "ccc"
+    3) "aaa"
+    redis-S:6379>
+    ```
+- ZLEXCOUNT key min max 在有序集合中计算指定字典区间内成员数量
+- ZRANGEBYLEX key min max [LIMIT offset count] 通过字典区间返回有序集合的成员
+    - 当有序集合的所有成员都具有相同的分值时， 有序集合的元素会根据成员的字典序（lexicographical ordering）来进行排序， 而这个命令则可以返回给定的有序集合键 key 中， 值介于 min 和 max 之间的成员
+    - 合法的 min 和 max 参数必须包含 ( 或者 [ ， 其中 ( 表示开区间（指定的值不会被包含在范围之内）， 而 [ 则表示闭区间（指定的值会被包含在范围之内）
+    - 特殊值 + 和 - 在 min 参数以及 max 参数中具有特殊的意义， 其中 + 表示正无限， 而 - 表示负无限。 因此， 向一个所有成员的分值都相同的有序集合发送命令 ZRANGEBYLEX <zset> - + ， 命令将返回有序集合中的所有元素
+    ```java
+    redis-S:6379> zadd zsetTest 0 a 0 b 0 c 0 d 0 e 0 f 0 g
+    (integer) 7
+    redis-S:6379> zlexcount zsetTest - +
+    (integer) 7
+    redis-S:6379> zrange zsetTest 0 -1
+    1) "a"
+    2) "b"
+    3) "c"
+    4) "d"
+    5) "e"
+    6) "f"
+    7) "g"
+    redis-S:6379> zrangebylex zsetTest - (d
+    1) "a"
+    2) "b"
+    3) "c"
+    redis-S:6379> zrangebylex zsetTest [d +
+    1) "d"
+    2) "e"
+    3) "f"
+    4) "g"
+    redis-S:6379>
+    ```
+- ZRANGEBYSCORE key min max [WITHSCORES] [LIMIT] 通过分数返回有序集合指定区间内的成员
+    ```java
+    redis-S:6379> keys *
+    (empty list or set)
+    redis-S:6379> zadd zsetTest 11 aaa 22 bbb 33 ccc 44 ddd
+    (integer) 4
+    redis-S:6379> zrange zsetTest 0 -1
+    1) "aaa"
+    2) "bbb"
+    3) "ccc"
+    4) "ddd"
+    redis-S:6379> zrangebyscore zsetTest -inf +inf
+    1) "aaa"
+    2) "bbb"
+    3) "ccc"
+    4) "ddd"
+    redis-S:6379> zrangebyscore zsetTest -inf 22
+    1) "aaa"
+    2) "bbb"
+    redis-S:6379> zrangebyscore zsetTest  (22 +inf
+    1) "ccc"
+    2) "ddd"
+    redis-S:6379> zrangebyscore zsetTest  (22 +inf withscores
+    1) "ccc"
+    2) "33"
+    3) "ddd"
+    4) "44"
+    redis-S:6379>
+    ```
+- ZINTERSTORE destination numkeys key [key ...] 计算给定的一个或多个有序集的交集并将结果集存储在新的有序集合 key 中
+- ZUNIONSTORE destination numkeys key [key ...] 计算给定的一个或多个有序集的并集，并存储在新的 key 中
+    ```java
+    redis-S:6379> zrange zsetTest 0 -1
+    1) "aaa"
+    2) "bbb"
+    3) "ccc"
+    4) "ddd"
+    redis-S:6379> zadd zsetTest002 11 aaa 66 yyy
+    (integer) 2
+    redis-S:6379> ZINTERSTORE dest 2 zsetTest zsetTest002
+    (integer) 1
+    redis-S:6379> zrange dest 0 -1
+    1) "aaa"
+    redis-S:6379> zrange dest 0 -1 withscores
+    1) "aaa"
+    2) "22"
+    redis-S:6379> zunionstore dest2 2 zsetTest zsetTest002
+    (integer) 5
+    redis-S:6379> zrange dest2 0 -1 withscores
+    1) "aaa"
+    2) "22"
+    3) "bbb"
+    4) "22"
+    5) "ccc"
+    6) "33"
+    7) "ddd"
+    8) "44"
+    9) "yyy"
+    10) "66"
+    redis-S:6379>
+    ```
 - ZREMRANGEBYLEX key min max 移除有序集合中给定的字典区间的所有成员
 - ZREMRANGEBYRANK key start stop 移除有序集合中给定的排名区间的所有成员
 - ZREMRANGEBYSCORE key min max 移除有序集合中给定的分数区间的所有成员
+    ```java
+    redis-S:6379> zrange zsetTest003 0 -1
+    1) "a"
+    2) "b"
+    3) "c"
+    4) "d"
+    5) "e"
+    6) "f"
+    7) "g"
+    redis-S:6379> zremrangebylex zsetTest003 (c [f
+    (integer) 3
+    redis-S:6379> zrange zsetTest003 0 -1
+    1) "a"
+    2) "b"
+    3) "c"
+    4) "g"
+    redis-S:6379> zrange zsetTest 0 -1 withscores
+    1) "aaa"
+    2) "11"
+    3) "bbb"
+    4) "22"
+    5) "ccc"
+    6) "33"
+    7) "ddd"
+    8) "44"
+    redis-S:6379> zremrangebyrank zsetTest 1 2
+    (integer) 2
+    redis-S:6379> zrange zsetTest 0 -1 withscores
+    1) "aaa"
+    2) "11"
+    3) "ddd"
+    4) "44"
+    redis-S:6379> zremrangebyscore zsetTest 11 33
+    (integer) 1
+    redis-S:6379> zrange zsetTest 0 -1 withscores
+    1) "ddd"
+    2) "44"
+    redis-S:6379>
+    ```
+- ZRANGE key start stop [WITHSCORES] 通过索引区间返回有序集合成指定区间内的成员
 - ZREVRANGE key start stop [WITHSCORES] 返回有序集中指定区间内的成员，通过索引，分数从高到底
 - ZREVRANGEBYSCORE key max min [WITHSCORES] 返回有序集中指定分数区间内的成员，分数从高到低排序
 - ZREVRANK key member 返回有序集合中指定成员的排名，有序集成员按分数值递减(从大到小)排序
-- ZSCORE key member 返回有序集中，成员的分数值
-- ZUNIONSTORE destination numkeys key [key ...] 计算给定的一个或多个有序集的并集，并存储在新的 key 中
+    ```java
+    redis-S:6379> zrange zsetTest 0 -1 withscores
+    1) "aa"
+    2) "11"
+    3) "bb"
+    4) "22"
+    5) "cc"
+    6) "33"
+    7) "ddd"
+    8) "44"
+    redis-S:6379> zrevrange zsetTest 0 -1 withscores
+    1) "ddd"
+    2) "44"
+    3) "cc"
+    4) "33"
+    5) "bb"
+    6) "22"
+    7) "aa"
+    8) "11"
+    redis-S:6379> zrevrangebyscore zsetTest 33 11
+    1) "cc"
+    2) "bb"
+    3) "aa"
+    redis-S:6379> zrevrank zsetTest ddd
+    (integer) 0
+    redis-S:6379> zrevrank zsetTest aa
+    (integer) 3
+    redis-S:6379>
+    ```
 - ZSCAN key cursor [MATCH pattern] [COUNT count] 迭代有序集合中的元素（包括元素成员和元素分值）
-
+    ```java
+    redis-S:6379> zrevrange zsetTest 0 -1 withscores
+    1) "ddd"
+    2) "44"
+    3) "cc"
+    4) "33"
+    5) "bb"
+    6) "22"
+    7) "aa"
+    8) "11"
+    redis-S:6379> zscan zsetTest 0 match dd*
+    1) "0"
+    2) 1) "ddd"
+    2) "44"
+    redis-S:6379>
+    ```
 #### Redis HyperLogLog 命令
 - PFADD key element [element ...] 添加指定元素到 HyperLogLog 中
 - PFCOUNT key [key ...] 返回给定 HyperLogLog 的基数估算值
