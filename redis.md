@@ -24,6 +24,10 @@ Redis
     - [Redis sorted set 命令](#redis-sorted-set-%E5%91%BD%E4%BB%A4)
     - [Redis HyperLogLog 命令](#redis-hyperloglog-%E5%91%BD%E4%BB%A4)
     - [reference](#reference)
+- [Redis 持久化](#redis-%E6%8C%81%E4%B9%85%E5%8C%96)
+    - [RDB](#rdb)
+    - [AOF](#aof)
+    - [reference](#reference)
 
 <!-- /TOC -->
 ### Redis 官网
@@ -1010,7 +1014,27 @@ PONG
 - PFADD key element [element ...] 添加指定元素到 HyperLogLog 中
 - PFCOUNT key [key ...] 返回给定 HyperLogLog 的基数估算值
 - PFMERGE destkey sourcekey [sourcekey ...] 将多个 HyperLogLog 合并为一个 HyperLogLog
-
+    ```java
+    redis-S:6379> keys *
+    (empty list or set)
+    redis-S:6379> pfadd hylog a b c d e f g h i j
+    (integer) 1
+    redis-S:6379> pfcount hylog
+    (integer) 10
+    redis-S:6379> pfadd hylog2 h i j k l m
+    (integer) 1
+    redis-S:6379> pfmerge hylog hylog2
+    OK
+    redis-S:6379> pfcount hylog
+    (integer) 13
+    redis-S:6379> pfcount hylog2
+    (integer) 6
+    redis-S:6379> pfmerge hylog3 hylog hylog2
+    OK
+    redis-S:6379> pfcount hylog3
+    (integer) 13
+    redis-S:6379>
+    ```
 #### reference
 - [http://www.redis.cn/commands](http://www.redis.cn/commands)
 - [Redis 字符串命令](http://www.runoob.com/redis/redis-strings.html)
@@ -1019,3 +1043,20 @@ PONG
 - [Redis set 命令](http://www.runoob.com/redis/redis-sets.html)
 - [Redis zset 命令](http://www.runoob.com/redis/redis-sorted-sets.html)
 - [Redis HyperLogLog 命令](http://www.runoob.com/redis/redis-hyperloglog.html)
+
+### Redis 持久化
+- 什么是持久化 Redis的数据操作都是在内存中进行的，如果服务挂掉的话，数据会丢失。所谓持久化，就是将redis保存在内存中的数据，异步保存到磁盘上，以便在需要的时候，对数据进行恢复。
+- redis数据持久化方式  快照(RDB); 写日志(AOF)
+#### RDB
+- 什么是RDB
+将Redis内存中的数据，完整的生成一个快照，以二进制格式文件（.rdb文件）保存在硬盘当中。当需要进行恢复时，再从硬盘加载到内存中。
+
+   ![Redis rdbs](/imgs/redis/6_redis_rdb.png)
+
+- RDB的触发方式
+
+
+#### AOF
+
+#### reference
+- [http://redisdoc.com/topic/persistence.html](http://redisdoc.com/topic/persistence.html)
