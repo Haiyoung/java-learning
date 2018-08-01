@@ -1047,16 +1047,50 @@ PONG
 ### Redis 持久化
 - 什么是持久化 Redis的数据操作都是在内存中进行的，如果服务挂掉的话，数据会丢失。所谓持久化，就是将redis保存在内存中的数据，异步保存到磁盘上，以便在需要的时候，对数据进行恢复。
 - redis数据持久化方式  快照(RDB); 写日志(AOF)
+- Redis 还可以同时使用 AOF 持久化和 RDB 持久化。 在这种情况下， 当 Redis 重启时， 它会优先使用 AOF 文件来还原数据集， 因为 AOF 文件保存的数据集通常比 RDB 文件所保存的数据集更完整
+- 持久化功能是可以关闭的，让数据只在服务器运行时存在
 #### RDB
 - 什么是RDB
-将Redis内存中的数据，完整的生成一个快照，以二进制格式文件（.rdb文件）保存在硬盘当中。当需要进行恢复时，再从硬盘加载到内存中。
+
+    RDB Redis Database File, 将Redis内存中的数据，完整的生成一个快照，以二进制格式文件（.rdb文件）保存在硬盘当中。当需要进行恢复时，再从硬盘加载到内存中。
 
    ![Redis rdbs](/imgs/redis/6_redis_rdb.png)
 
 - RDB的触发方式
+    - save(同步)
 
+        ![Redis rdbs](/imgs/redis/7_redis_rdb_save.png)
+        - save命令触发RDB快照持久化，命令会阻塞Redis服务，直至rdb文件生成结束
+        - 如果已经存在rdb文件，则新生成的rdb文件会替换旧的rdb文件
+    - bgsave(异步)
+
+        ![Redis rdbs](/imgs/redis/8_redis_rdb_bgsave.png)
+        - bgsave命令在触发RDB持久化时，在fork()函数产生子进程的过程中，依然有可能短暂阻塞Redis服务
+        - fork()出子进程，会消耗额外的内存，但是基本不会阻塞redis命令
+    - config(满足条件，自动触发)
+        - 在redis配置文件中，添加如下配置，在满足条件时，会自动触发RDB快照
+        - 一般不推荐配置自动触发RDB快照的持久化方式
+        ```python
+        # 配置自动生成规则。一般不建议配置自动生成RDB文件
+        save 900 1      #900秒内改变1条数据，自动生成RDB文件
+        save 300 10     #300秒内改变10条数据，自动生成RDB文件
+        save 60 10000   #60秒内改变1万条数据，自动生成RDB文件
+        # 指定rdb文件名
+        dbfilename dump-${port}.rdb
+        # 指定rdb文件目录
+        dir /opt/redis/data
+        # bgsave发生错误，停止写入
+        stop-writes-on-bgsave-error yes
+        # rdb文件采用压缩格式
+        rdbcompression yes
+        # 对rdb文件进行校验
+        rdbchecksum yes
+        ```
 
 #### AOF
+- 什么是AOF
+
+    AOF Append Only File, 持久化记录服务器执行的所有写操作命令，并在服务器启动时，通过重新执行这些命令来还原数据集。 AOF 文件中的命令全部以 Redis 协议的格式来保存，新命令会被追加到文件的末尾。 Redis 还可以在后台对 AOF 文件进行重写（rewrite），使得 AOF 文件的体积不会超出保存数据集状态所需的实际大小。
 
 #### reference
 - [http://redisdoc.com/topic/persistence.html](http://redisdoc.com/topic/persistence.html)
