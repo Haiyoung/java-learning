@@ -27,7 +27,9 @@ Redis
 - [Redis 持久化](#redis-%E6%8C%81%E4%B9%85%E5%8C%96)
     - [RDB](#rdb)
     - [AOF](#aof)
+    - [持久化最佳策略](#%E6%8C%81%E4%B9%85%E5%8C%96%E6%9C%80%E4%BD%B3%E7%AD%96%E7%95%A5)
     - [reference](#reference)
+- [Redis 实现分布式锁](#redis-%E5%AE%9E%E7%8E%B0%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81)
 
 <!-- /TOC -->
 ### Redis 官网
@@ -1076,7 +1078,7 @@ PONG
         save 300 10     #300秒内改变10条数据，自动生成RDB文件
         save 60 10000   #60秒内改变1万条数据，自动生成RDB文件
         # 指定rdb文件名
-        dbfilename dump-${port}.rdb
+        dbfilename dump.rdb
         # 指定rdb文件目录
         dir /opt/redis/data
         # bgsave发生错误，停止写入
@@ -1091,6 +1093,77 @@ PONG
 - 什么是AOF
 
     AOF Append Only File, 持久化记录服务器执行的所有写操作命令，并在服务器启动时，通过重新执行这些命令来还原数据集。 AOF 文件中的命令全部以 Redis 协议的格式来保存，新命令会被追加到文件的末尾。 Redis 还可以在后台对 AOF 文件进行重写（rewrite），使得 AOF 文件的体积不会超出保存数据集状态所需的实际大小。
+    ![Redis rdbs](/imgs/redis/9_redis_aof.png)
+    - 所有的写入命令会追加到aof_buf（缓冲区）中
+    - AOF缓冲区根据配置的策略向硬盘做同步操作
+    - 随着AOF文件越来越大，需要定期对AOF文件进行重写，重写可以压缩AOF文件,也能使文件被更快的加载
+    - 当Redis服务重启时，可以加载AOF文件进行数据恢复
+- 命令写入
+    - Redis执行写命令，将命令刷新到硬盘缓冲区当中
+    - 所有写入命令都包含追加操作，直接采用协议格式，避免二次处理开销
+- 缓冲同步
+    - always 命令写入缓冲区后，立即调用同步操作，将写命令追加到AOF文件，追加完成后，线程返回
+    - everysec 让缓冲区中的数据每秒刷新一次到AOF文件，相比always，在高写入量的情况下，可以保护硬盘。出现故障可能会丢失一秒数据(这也是AOF的默认策略)
+    - no 刷新策略让操作系统来决定
+- AOF重写
+    - 随着时间的推移，命令的逐步写入。AOF文件也会逐渐变大。当我们用AOF来恢复时会很慢，而且当文件无限增大时，对硬盘的管理，对写入的速度也会有产生影响。Redis当然考虑到这个问题，所以就有了AOF重写
+    - 原生AOF
+    ```shell
+    set hello world
+    set hello java
+    set hello python
+    incr counter
+    incr counter
+    rpush mylist a
+    rpush mylist b
+    rpush mylist c
+    过期数据
+    ```
+    - 重写后的AOF
+    ```shell
+    set hello python
+    set counter 2
+    rpush mylist a b c
+    ```
+    - AOF重写的方式
+        - bgrewriteaof 类似于RDB快照中，bgsave的执行过程；redis客户端向Redis发bgrewriteaof命令，redis服务端fork一个子进程去完成AOF重写。这里的AOF重写，是将Redis内存中的数据进行一次回溯，回溯成AOF文件。而不是重写AOF文件生成新的AOF文件去替换
 
+            ![Redis rdbs](/imgs/redis/10_redis_aof_rewrite.png)
+        - aof重写配置
+        auto-aof-rewrite-min-size：AOF文件重写需要的尺寸
+        auto-aof-rewrite-percentage：AOF文件增长率
+        redis提供了aof_current_size和aof_base_size，分别用来统计AOF当前尺寸（单位：字节）和AOF上次启动和重写的尺寸（单位：字节）
+        AOF自动重写的触发时机，同时满足以下两点：
+        - aof_current_size > auto-aof-rewrite-min-size
+        - aof_current_size - aof_base_size/aof_base_size > auto-aof-rewrite-percentage
+        ```python
+        # 开启正常AOF的append刷盘操作
+        appendonly yes
+        # AOF文件名
+        appendfilename "appendonly.aof"
+        # 每秒刷盘
+        appendfsync everysec
+        # 文件目录
+        dir /opt/redis/data
+        # AOF重写增长率
+        auto-aof-rewrite-percentage 100
+        # AOF重写最小尺寸
+        auto-aof-rewrite-min-size 64mb
+        # AOF重写期间是否暂停append操作。AOF重写非常消耗磁盘性能，而正常的AOF过程中也会往磁盘刷数据。
+        # 通常偏向考虑性能，设为yes。万一重写失败了，这期间正常AOF的数据会丢失，因为我们选择了重写期间放弃了正常AOF刷盘。
+        no-appendfsync-on-rewrite yes
+        ```
+#### 持久化最佳策略
+- RDB最佳策略
+    - 建议关闭RDB，无论是Redis主节点，还是从节点，都建议关掉RDB。但是关掉不是绝对的，主从复制时还是会借助RDB
+    - 用作数据备份，RDB虽然是很重的操作，但是对数据备份很有作用。文件大小比较小，可以按天或按小时进行数据备份
+    - 在极个别的场景下，需要在从节点开RDB，可以再本地保存这样子的一个历史的RDB文件。虽然从节点不进行读写，但是Redis往往单机多部署，由于RDB是个很重的操作，所以还是会对CPU、硬盘和内存造成一定影响。根据实际需求进行设定
+- AOF最佳策略
+    - 建议开启AOF，如果Redis数据只是用作数据源的缓存，并且缓存丢失后从数据源重新加载不会对数据源造成太大压力，这种情况下，AOF可以关
+    - AOF重写集中管理，单机多部署情况下，发生大量fork可能会内存爆满
+    - everysec 建议采用每秒刷盘策略
 #### reference
 - [http://redisdoc.com/topic/persistence.html](http://redisdoc.com/topic/persistence.html)
+- [Redis持久化](https://segmentfault.com/a/1190000012316003)
+
+### Redis 实现分布式锁
