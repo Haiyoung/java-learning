@@ -30,6 +30,8 @@ Redis
     - [持久化最佳策略](#%E6%8C%81%E4%B9%85%E5%8C%96%E6%9C%80%E4%BD%B3%E7%AD%96%E7%95%A5)
     - [reference](#reference)
 - [Redis 实现分布式锁](#redis-%E5%AE%9E%E7%8E%B0%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81)
+    - [单机模式的Redis分布式锁](#%E5%8D%95%E6%9C%BA%E6%A8%A1%E5%BC%8F%E7%9A%84redis%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81)
+    - [集群模式的Redis分布式锁 Redlock](#%E9%9B%86%E7%BE%A4%E6%A8%A1%E5%BC%8F%E7%9A%84redis%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81-redlock)
 
 <!-- /TOC -->
 ### Redis 官网
@@ -1167,3 +1169,72 @@ PONG
 - [Redis持久化](https://segmentfault.com/a/1190000012316003)
 
 ### Redis 实现分布式锁
+#### 单机模式的Redis分布式锁
+- 优缺点
+    - 实现比较轻，大多数时候能满足需求；因为是单机单实例部署，如果redis服务宕机，那么所有需要获取分布式锁的地方均无法获取锁，将全部阻塞，需要做好降级处理。
+    - 当锁过期后，执行任务的进程还没有执行完，但是锁因为自动过期已经解锁，可能被其它进程重新加锁，这就造成多个进程同时获取到了锁。
+- 实现代码
+  ```java
+    import redis.clients.jedis.Jedis;
+    import java.util.Collections;
+
+    public class JedisDistributedLock {
+
+        private static final String LOCK_SUCCESS = "OK";
+        private static final Long RELEASE_SUCCESS = 1L;
+
+        private static final String SET_IF_NOT_EXIST = "NX";
+        private static final String SET_WITH_EXPIRE_TIME = "PX";
+
+        // 获取锁，不设置超时时间
+        public static boolean getLock(Jedis jedis, String lockKey, String requestId){
+            String result = jedis.set(lockKey, requestId, SET_IF_NOT_EXIST);
+            if(LOCK_SUCCESS.equals(result)){
+                return true;
+            }
+            return false;
+        }
+
+        // 获取锁, 设置超时时间，单位为毫秒
+        public static boolean getLock(Jedis jedis, String lockKey, String requestId, Long expireTime){
+
+            /**
+            * jedis.set(key, value, nxxx, expx, time)
+            *
+            * Set the string value as value of the key. The string can't be longer than 1073741824 bytes (1
+            * GB).
+            * @param key
+            * @param value
+            * @param NXXX NX|XX, NX -- Only set the key if it does not already exist. XX -- Only set the key if it already exist.
+            * @param EXPX EX|PX, expire time units: EX = seconds; PX = milliseconds
+            *
+            * @return Status code reply set成功，返回 OK
+            */
+            String result = jedis.set(lockKey, requestId, SET_IF_NOT_EXIST, SET_WITH_EXPIRE_TIME, expireTime);
+            if(LOCK_SUCCESS.equals(result)){
+                return true;
+            }
+            return false;
+        }
+
+        //释放锁
+        public static boolean releaseLock(Jedis jedis, String lockKey, String requestId){
+
+            // Lua脚本
+            String script = "if redis.call('get',KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end";
+            Object result = jedis.eval(script, Collections.singletonList(lockKey), Collections.singletonList(requestId));
+            if(RELEASE_SUCCESS.equals(result)){
+                return true;
+            }
+            return false;
+        }
+    }
+  ```
+#### 集群模式的Redis分布式锁 Redlock
+- 优缺点
+    - Redlock是Redis的作者antirez给出的集群模式的Redis分布式锁，它基于N个完全独立的Redis节点
+    - 部分节点宕机，依然可以保证锁的可用性
+    - 当某个节点宕机后，又立即重启了，可能会出现两个客户端同时持有同一把锁，如果节点设置了持久化，出现这种情况的几率会降低
+    - 和单机模式Redis锁相比，实现难度要大一些
+- 实现代码
+  
