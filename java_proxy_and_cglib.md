@@ -224,15 +224,15 @@ public class CglibProxy {
 
     private Object obj;
 
-    public Object bind(final Object targey){
-        this.obj = targey;
+    public Object bind(final Object target){
+        this.obj = target;
         Enhancer enhancer = new Enhancer();
         enhancer.setSuperclass(obj.getClass());
         enhancer.setCallback(new MethodInterceptor() {
             @Override
             public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {
                 System.out.println("before... this is cglib proxy");
-                Object res = method.invoke(targey, objects);
+                Object res = method.invoke(target, objects);
                 System.out.println("after... this is cglib proxy");
                 return res;
             }
