@@ -1,14 +1,16 @@
 <!-- TOC -->
 
-- [spring事物](#spring事物)
-    - [spring事物特性](#spring事物特性)
-    - [spring事物的传播机制](#spring事物的传播机制)
-    - [spring事物的隔离级别](#spring事物的隔离级别)
-    - [脏读 幻读 不可重复读](#脏读-幻读-不可重复读)
-    - [reference](#reference)
-- [spring bean的生命周期和作用域](#spring-bean的生命周期和作用域)
+- [Spring](#spring)
+    - [spring事物](#spring%E4%BA%8B%E7%89%A9)
+        - [spring事物特性](#spring%E4%BA%8B%E7%89%A9%E7%89%B9%E6%80%A7)
+        - [spring事物的传播机制](#spring%E4%BA%8B%E7%89%A9%E7%9A%84%E4%BC%A0%E6%92%AD%E6%9C%BA%E5%88%B6)
+        - [spring事物的隔离级别](#spring%E4%BA%8B%E7%89%A9%E7%9A%84%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB)
+        - [脏读 幻读 不可重复读](#%E8%84%8F%E8%AF%BB-%E5%B9%BB%E8%AF%BB-%E4%B8%8D%E5%8F%AF%E9%87%8D%E5%A4%8D%E8%AF%BB)
+        - [reference](#reference)
+    - [spring bean的生命周期和作用域](#spring-bean%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E5%92%8C%E4%BD%9C%E7%94%A8%E5%9F%9F)
 
 <!-- /TOC -->
+## Spring
 ### spring事物
 #### spring事物特性
 - Atomicity 原子性,一个事务中所有对数据库的操作是一个不可分割的操作序列，要么全做要么全不做
