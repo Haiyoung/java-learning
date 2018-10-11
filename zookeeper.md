@@ -1,0 +1,6 @@
+### zookeeper
+#### 什么是zookeeper
+ZooKeeper is a centralized service for maintaining configuration information, naming, providing distributed synchronization, and providing group services. All of these kinds of services are used in some form or another by distributed applications. Each time they are implemented there is a lot of work that goes into fixing the bugs and race conditions that are inevitable. Because of the difficulty of implementing these kinds of services, applications initially usually skimp on them ,which make them brittle in the presence of change and difficult to manage. Even when done correctly, different implementations of these services lead to management complexity when the applications are deployed.
+    Zookeeper是一种提供配置信息维护、命名空间、分布式同步以及组服务等中心式服务的中间件。所有的这些服务都应用于不同形式的分布式应用中。
+每次构建分布式系统时，总是需要花费很多精力来修复很多bug和处理很多不可避免的竞态条件。由于构建这些服务的难度很高，应用程序最初都是想要
+忽略这些问题，这也使得应用在多变的环境下变的得脆弱和难以管理。即使正确的构建了这些应用，这些应用对不同实现也会带来应用部署和发布上的巨大开销。
