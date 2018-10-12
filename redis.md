@@ -1339,6 +1339,8 @@ PONG
     [OK] All 16384 slots covered.
     ```
     - 使用Redission构建redLock
+    &#160; &#160; &#160; &#160;Redis集群使用分片的方式保存键值对，redis-cluster采用slot(槽)的概念，一共16384个槽位，分布在集群中的所有master实例上。保存数据时，直接对key值做CRC16得到的校验值对16384取模，将键值对存储到对应的槽位所在的实例上。
+    
     ```java
     import org.redisson.Redisson;
     import org.redisson.api.RAtomicLong;
@@ -1445,6 +1447,7 @@ PONG
     执行main函数，进行测试：
     ```java
     //建立的集群关系如下所示：
+    //可以看到集群关系以及槽位分配信息
     12:41:14.749 [redisson-netty-1-7] DEBUG org.redisson.cluster.ClusterConnectionManager - cluster nodes state from 127.0.0.1/127.0.0.1:7001:
     d0e3588845a839052d9e611853740edd3b348966 127.0.0.1:7000 master - 0 1539319273461 1 connected 0-5460
     d94710251235efde7da4073cc4ff104d9298bd0f 127.0.0.1:7005 slave 5724fb03c4527389be0d556c5dc5419a12d367c5 0 1539319273963 6 connected
