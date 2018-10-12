@@ -1,37 +1,37 @@
 Redis
 <!-- TOC -->
 
-- [Redis 官网](#redis-%E5%AE%98%E7%BD%91)
-- [Redis 概况](#redis-%E6%A6%82%E5%86%B5)
-    - [Redis 是什么？](#redis-%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F)
-    - [Redis 数据结构](#redis-%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84)
-        - [value 对应的五种数据结构](#value-%E5%AF%B9%E5%BA%94%E7%9A%84%E4%BA%94%E7%A7%8D%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84)
-        - [Redis 核心对象 redisObject](#redis-%E6%A0%B8%E5%BF%83%E5%AF%B9%E8%B1%A1-redisobject)
-            - [编码方式（encoding）](#%E7%BC%96%E7%A0%81%E6%96%B9%E5%BC%8F%EF%BC%88encoding%EF%BC%89)
-        - [Redis 五种数据结构对应的内部编码](#redis-%E4%BA%94%E7%A7%8D%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%AF%B9%E5%BA%94%E7%9A%84%E5%86%85%E9%83%A8%E7%BC%96%E7%A0%81)
+- [Redis 官网](#redis-官网)
+- [Redis 概况](#redis-概况)
+    - [Redis 是什么？](#redis-是什么)
+    - [Redis 数据结构](#redis-数据结构)
+        - [value 对应的五种数据结构](#value-对应的五种数据结构)
+        - [Redis 核心对象 redisObject](#redis-核心对象-redisobject)
+            - [编码方式（encoding）](#编码方式encoding)
+        - [Redis 五种数据结构对应的内部编码](#redis-五种数据结构对应的内部编码)
     - [reference](#reference)
-- [搭建 Redis 环境](#%E6%90%AD%E5%BB%BA-redis-%E7%8E%AF%E5%A2%83)
-    - [启动 redis server](#%E5%90%AF%E5%8A%A8-redis-server)
-    - [启动 redis-cli](#%E5%90%AF%E5%8A%A8-redis-cli)
-    - [redis-cli连接远程服务](#redis-cli%E8%BF%9E%E6%8E%A5%E8%BF%9C%E7%A8%8B%E6%9C%8D%E5%8A%A1)
-    - [reference](#reference)
-- [Redis命令](#redis%E5%91%BD%E4%BB%A4)
-    - [Redis keys 命令](#redis-keys-%E5%91%BD%E4%BB%A4)
-    - [Redis 字符串命令](#redis-%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%91%BD%E4%BB%A4)
-    - [Redis hash 命令](#redis-hash-%E5%91%BD%E4%BB%A4)
-    - [Redis list 命令](#redis-list-%E5%91%BD%E4%BB%A4)
-    - [Redis set 命令](#redis-set-%E5%91%BD%E4%BB%A4)
-    - [Redis sorted set 命令](#redis-sorted-set-%E5%91%BD%E4%BB%A4)
-    - [Redis HyperLogLog 命令](#redis-hyperloglog-%E5%91%BD%E4%BB%A4)
-    - [reference](#reference)
-- [Redis 持久化](#redis-%E6%8C%81%E4%B9%85%E5%8C%96)
+- [搭建 Redis 环境](#搭建-redis-环境)
+    - [启动 redis server](#启动-redis-server)
+    - [启动 redis-cli](#启动-redis-cli)
+    - [redis-cli连接远程服务](#redis-cli连接远程服务)
+    - [reference](#reference-1)
+- [Redis命令](#redis命令)
+    - [Redis keys 命令](#redis-keys-命令)
+    - [Redis 字符串命令](#redis-字符串命令)
+    - [Redis hash 命令](#redis-hash-命令)
+    - [Redis list 命令](#redis-list-命令)
+    - [Redis set 命令](#redis-set-命令)
+    - [Redis sorted set 命令](#redis-sorted-set-命令)
+    - [Redis HyperLogLog 命令](#redis-hyperloglog-命令)
+    - [reference](#reference-2)
+- [Redis 持久化](#redis-持久化)
     - [RDB](#rdb)
     - [AOF](#aof)
-    - [持久化最佳策略](#%E6%8C%81%E4%B9%85%E5%8C%96%E6%9C%80%E4%BD%B3%E7%AD%96%E7%95%A5)
-    - [reference](#reference)
-- [Redis 实现分布式锁](#redis-%E5%AE%9E%E7%8E%B0%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81)
-    - [单机模式的Redis分布式锁](#%E5%8D%95%E6%9C%BA%E6%A8%A1%E5%BC%8F%E7%9A%84redis%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81)
-    - [集群模式的Redis分布式锁 Redlock](#%E9%9B%86%E7%BE%A4%E6%A8%A1%E5%BC%8F%E7%9A%84redis%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81-redlock)
+    - [持久化最佳策略](#持久化最佳策略)
+    - [reference](#reference-3)
+- [Redis 实现分布式锁](#redis-实现分布式锁)
+    - [单机模式的Redis分布式锁](#单机模式的redis分布式锁)
+    - [集群模式的Redis分布式锁 Redlock](#集群模式的redis分布式锁-redlock)
 
 <!-- /TOC -->
 ### Redis 官网
@@ -1237,4 +1237,263 @@ PONG
     - 当某个节点宕机后，又立即重启了，可能会出现两个客户端同时持有同一把锁，如果节点设置了持久化，出现这种情况的几率会降低
     - 和单机模式Redis锁相比，实现难度要大一些
 - 实现代码
+    - 搭建redis集群
+    ```shell
+    # 安装指定版本的redis
+    cd /opt
+    wget http://download.redis.io/releases/redis-3.2.8.tar.gz
+    tar xzf redis-3.2.8.tar.gz && rm redis-3.2.8.tar.gz
+    cd redis-3.2.8
+    make
+    ```
+    ```shell
+    # 构建redis集群
+    cd
+    mkdir cluster-test
+    cd cluster-test
+    mkdir conf logs bin
+    # 拷贝客户端服务器文件
+    rsync -avp /opt/redis-3.2.8/src/redis-server bin/
+    rsync -avp /opt/redis-3.2.8/src/redis-cli bin/
+    # 配置文件
+    for i in 7000 7001 7002 7003 7004 7005; do
+    cat << EOF > conf/${i}.conf
+    port ${i}
+    cluster-enabled yes
+    cluster-config-file nodes-${i}.conf
+    cluster-node-timeout 5000
+    appendonly yes
+    logfile "logs/${i}.log"
+    appendfilename "appendonly-${i}.aof"
+    EOF
+    done
+    # 启动
+    cd ${HOME}/cluster-test
+    for i in 7000 7001 7002 7003 7004 7005; do
+    ./bin/redis-server ./conf/${i}.conf &
+    done
+    # 创建集群
+    sudo apt-get install -y ruby rubygems
+    gem install redis
+    cd /opt/redis-3.2.8/src/
+    ./redis-trib.rb create --replicas 1 127.0.0.1:7000 127.0.0.1:7001 127.0.0.1:7002 127.0.0.1:7003 127.0.0.1:7004 127.0.0.1:7005
+    # 测试
+    cd ${HOME}/cluster-test/
+    ./bin/redis-cli -c -p 7000 cluser nodes
+    # 停止
+    #cd ${HOME}/cluster-test
+    #for i in 7000 7001 7002 7003 7004 7005; do
+    #./bin/redis-cli -p ${i} shutdown && echo "redis ${i} 已停止"
+    #done
+    ```
+    脚本执行后，出现如下日志，说明集群搭建成功
+    ```shell
+    >>> Creating cluster
+    >>> Performing hash slots allocation on 6 nodes...
+    Using 3 masters:
+    127.0.0.1:7000
+    127.0.0.1:7001
+    127.0.0.1:7002
+    Adding replica 127.0.0.1:7003 to 127.0.0.1:7000
+    Adding replica 127.0.0.1:7004 to 127.0.0.1:7001
+    Adding replica 127.0.0.1:7005 to 127.0.0.1:7002
+    M: d0e3588845a839052d9e611853740edd3b348966 127.0.0.1:7000
+    slots:0-5460 (5461 slots) master
+    M: 4f5518e78c1ea1c25bab0d0147f12c0281fd5f96 127.0.0.1:7001
+    slots:5461-10922 (5462 slots) master
+    M: 5724fb03c4527389be0d556c5dc5419a12d367c5 127.0.0.1:7002
+    slots:10923-16383 (5461 slots) master
+    S: 1206f7a76b8050b10e2e602fad422faee95efdb5 127.0.0.1:7003
+    replicates d0e3588845a839052d9e611853740edd3b348966
+    S: 8f421f529c86cefbf033e1e3a1687a9767802bd2 127.0.0.1:7004
+    replicates 4f5518e78c1ea1c25bab0d0147f12c0281fd5f96
+    S: d94710251235efde7da4073cc4ff104d9298bd0f 127.0.0.1:7005
+    replicates 5724fb03c4527389be0d556c5dc5419a12d367c5
+    Can I set the above configuration? (type 'yes' to accept): yes
+    >>> Nodes configuration updated
+    >>> Assign a different config epoch to each node
+    >>> Sending CLUSTER MEET messages to join the cluster
+    Waiting for the cluster to join...
+    >>> Performing Cluster Check (using node 127.0.0.1:7000)
+    M: d0e3588845a839052d9e611853740edd3b348966 127.0.0.1:7000
+    slots:0-5460 (5461 slots) master
+    1 additional replica(s)
+    S: 8f421f529c86cefbf033e1e3a1687a9767802bd2 127.0.0.1:7004
+    slots: (0 slots) slave
+    replicates 4f5518e78c1ea1c25bab0d0147f12c0281fd5f96
+    S: 1206f7a76b8050b10e2e602fad422faee95efdb5 127.0.0.1:7003
+    slots: (0 slots) slave
+    replicates d0e3588845a839052d9e611853740edd3b348966
+    M: 4f5518e78c1ea1c25bab0d0147f12c0281fd5f96 127.0.0.1:7001
+    slots:5461-10922 (5462 slots) master
+    1 additional replica(s)
+    S: d94710251235efde7da4073cc4ff104d9298bd0f 127.0.0.1:7005
+    slots: (0 slots) slave
+    replicates 5724fb03c4527389be0d556c5dc5419a12d367c5
+    M: 5724fb03c4527389be0d556c5dc5419a12d367c5 127.0.0.1:7002
+    slots:10923-16383 (5461 slots) master
+    1 additional replica(s)
+    [OK] All nodes agree about slots configuration.
+    >>> Check for open slots...
+    >>> Check slots coverage...
+    [OK] All 16384 slots covered.
+    ```
+    - 使用Redission构建redLock
+    ```java
+    import org.redisson.Redisson;
+    import org.redisson.api.RAtomicLong;
+    import org.redisson.api.RedissonClient;
+    import org.redisson.config.Config;
+
+    /**
+    * Created by Haiyoung on 2018/8/11.
+    */
+    public class RedissonManager {
+
+        private static final String RAtomicName = "genId_";
+
+        private static Config config = new Config();
+
+        private static RedissonClient redisson = null;
+
+        public static void init(){
+            try{
+                config.useClusterServers()
+                        .setScanInterval(200000)//设置集群状态扫描间隔
+                        .setMasterConnectionPoolSize(10000)//设置对于master节点的连接池中连接数最大为10000
+                        .setSlaveConnectionPoolSize(10000)//设置对于slave节点的连接池中连接数最大为500
+                        .setIdleConnectionTimeout(10000)//如果当前连接池里的连接数量超过了最小空闲连接数，而同时有连接空闲时间超过了该数值，那么这些连接将会自动被关闭，并从连接池里去掉。时间单位是毫秒。
+                        .setConnectTimeout(30000)//同任何节点建立连接时的等待超时。时间单位是毫秒。
+                        .setTimeout(3000)//等待节点回复命令的时间。该时间从命令发送成功时开始计时。
+                        .setRetryInterval(3000)//当与某个节点的连接断开时，等待与其重新建立连接的时间间隔。时间单位是毫秒。
+                        .addNodeAddress("redis://127.0.0.1:7000","redis://127.0.0.1:7001","redis://127.0.0.1:7002","redis://127.0.0.1:7003","redis://127.0.0.1:7004","redis://127.0.0.1:7005");
+                redisson = Redisson.create(config);
+
+                RAtomicLong atomicLong = redisson.getAtomicLong(RAtomicName);
+                atomicLong.set(1);//自增设置为从1开始
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+
+        public static RedissonClient getRedisson(){
+            if(redisson == null){
+                RedissonManager.init(); //初始化
+            }
+            return redisson;
+        }
+
+        /** 获取redis中的原子ID */
+        public static Long nextID(){
+            RAtomicLong atomicLong = getRedisson().getAtomicLong(RAtomicName);
+            atomicLong.incrementAndGet();
+            return atomicLong.get();
+        }
+    }
+    ```
+
+    ```java
+    import org.redisson.api.RLock;
+    import org.redisson.api.RedissonClient;
+
+    import java.util.concurrent.TimeUnit;
+
+    /**
+    * Created by Haiyoung on 2018/8/11.
+    */
+    public class DistributedRedisLock {
+
+        private static RedissonClient redisson = RedissonManager.getRedisson();
+        private static final String LOCK_TITLE = "redisLock_";
+
+        public static void acquire(String lockName){
+            String key = LOCK_TITLE + lockName;
+            RLock mylock = redisson.getLock(key);
+            mylock.lock(2, TimeUnit.MINUTES); //lock提供带timeout参数，timeout结束强制解锁，防止死锁
+            System.err.println("======lock======"+Thread.currentThread().getName());
+        }
+
+        public static void release(String lockName){
+            String key = LOCK_TITLE + lockName;
+            RLock mylock = redisson.getLock(key);
+            mylock.unlock();
+            System.err.println("======unlock======"+Thread.currentThread().getName());
+        }
+
+        public static void main(String[] args){
+            for (int i = 0; i < 3; i++) {
+                Thread t = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            String key = "test123";
+                            DistributedRedisLock.acquire(key);
+                            Thread.sleep(1000); //获得锁之后可以进行相应的处理
+                            System.err.println("======获得锁后进行相应的操作======");
+                            DistributedRedisLock.release(key);
+                            System.err.println("=============================");
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+                t.start();
+            }
+        }
+    }
+    ```
+    执行main函数，进行测试：
+    ```java
+    //建立的集群关系如下所示：
+    12:41:14.749 [redisson-netty-1-7] DEBUG org.redisson.cluster.ClusterConnectionManager - cluster nodes state from 127.0.0.1/127.0.0.1:7001:
+    d0e3588845a839052d9e611853740edd3b348966 127.0.0.1:7000 master - 0 1539319273461 1 connected 0-5460
+    d94710251235efde7da4073cc4ff104d9298bd0f 127.0.0.1:7005 slave 5724fb03c4527389be0d556c5dc5419a12d367c5 0 1539319273963 6 connected
+    5724fb03c4527389be0d556c5dc5419a12d367c5 127.0.0.1:7002 master - 0 1539319274465 3 connected 10923-16383
+    8f421f529c86cefbf033e1e3a1687a9767802bd2 127.0.0.1:7004 slave 4f5518e78c1ea1c25bab0d0147f12c0281fd5f96 0 1539319272458 5 connected
+    1206f7a76b8050b10e2e602fad422faee95efdb5 127.0.0.1:7003 slave d0e3588845a839052d9e611853740edd3b348966 0 1539319272961 4 connected
+    4f5518e78c1ea1c25bab0d0147f12c0281fd5f96 127.0.0.1:7001 myself,master - 0 0 2 connected 5461-10922
+    ```
+    ```java
+    //加锁解锁过程
+    ======lock======Thread-2
+    10:27:50.086 [redisson-netty-1-6] DEBUG org.redisson.command.CommandAsyncService - connection released for command (EVAL) and params [if (redis.call('exists', KEYS[1]) == 0) then redis.call('hset', KEYS[1], ARGV[2], 1); redis.call('pexpire', KEYS[1], ARGV[1]); return nil; end; if (redis.call('hexists', KEYS[1], ARGV[2]) == 1) then redis.call('hincrby', KEYS[1], ARGV[2], 1); redis.call('pexpire', KEYS[1], ARGV[1]); return nil; end; return redis.call('pttl', KEYS[1]);, 1, redisLock_test123, 120000, 20e96666-d967-4d3c-ac94-abeb14493160:20] from slot NodeSource [slot=null, addr=null, redisClient=null, redirect=null, entry=MasterSlaveEntry [masterEntry=[freeSubscribeConnectionsAmount=1, freeSubscribeConnectionsCounter=50, freeConnectionsAmount=31, freeConnectionsCounter=9999, freezed=false, freezeReason=null, client=[addr=redis://127.0.0.1:7002], nodeType=MASTER, firstFail=0]]] using connection RedisConnection@788625756 [redisClient=[addr=redis://127.0.0.1:7002], channel=[id: 0x9109c84f, L:/127.0.0.1:49276 - R:127.0.0.1/127.0.0.1:7002]]
+    10:27:50.096 [Thread-1] DEBUG org.redisson.cluster.ClusterConnectionManager - slot 12809 for redisLock_test123
+    10:27:50.102 [redisson-netty-1-6] DEBUG org.redisson.command.CommandAsyncService - connection released for command (EVAL) and params [if (redis.call('exists', KEYS[1]) == 0) then redis.call('hset', KEYS[1], ARGV[2], 1); redis.call('pexpire', KEYS[1], ARGV[1]); return nil; end; if (redis.call('hexists', KEYS[1], ARGV[2]) == 1) then redis.call('hincrby', KEYS[1], ARGV[2], 1); redis.call('pexpire', KEYS[1], ARGV[1]); return nil; end; return redis.call('pttl', KEYS[1]);, 1, redisLock_test123, 120000, 20e96666-d967-4d3c-ac94-abeb14493160:22] from slot NodeSource [slot=null, addr=null, redisClient=null, redirect=null, entry=MasterSlaveEntry [masterEntry=[freeSubscribeConnectionsAmount=0, freeSubscribeConnectionsCounter=49, freeConnectionsAmount=32, freeConnectionsCounter=10000, freezed=false, freezeReason=null, client=[addr=redis://127.0.0.1:7002], nodeType=MASTER, firstFail=0]]] using connection RedisConnection@615544583 [redisClient=[addr=redis://127.0.0.1:7002], channel=[id: 0x088086f4, L:/127.0.0.1:49194 - R:127.0.0.1/127.0.0.1:7002]]
+    10:27:50.120 [Thread-1] DEBUG org.redisson.cluster.ClusterConnectionManager - slot 12809 for redisLock_test123
+    10:27:50.120 [Thread-3] DEBUG org.redisson.cluster.ClusterConnectionManager - slot 12809 for redisLock_test123
+    10:27:50.121 [Thread-1] DEBUG org.redisson.command.CommandAsyncService - acquired connection for command (EVAL) and params [if (redis.call('exists', KEYS[1]) == 0) then redis.call('hset', KEYS[1], ARGV[2], 1); redis.call('pexpire', KEYS[1], ARGV[1]); return nil; end; if (redis.call('hexists', KEYS[1], ARGV[2]) == 1) then redis.call('hincrby', KEYS[1], ARGV[2], 1); redis.call('pexpire', KEYS[1], ARGV[1]); return nil; end; return redis.call('pttl', KEYS[1]);, 1, redisLock_test123, 120000, 20e96666-d967-4d3c-ac94-abeb14493160:20] from slot NodeSource [slot=null, addr=null, redisClient=null, redirect=null, entry=MasterSlaveEntry [masterEntry=[freeSubscribeConnectionsAmount=0, freeSubscribeConnectionsCounter=49, freeConnectionsAmount=31, freeConnectionsCounter=9999, freezed=false, freezeReason=null, client=[addr=redis://127.0.0.1:7002], nodeType=MASTER, firstFail=0]]] using node 127.0.0.1/127.0.0.1:7002... RedisConnection@1475932758 [redisClient=[addr=redis://127.0.0.1:7002], channel=[id: 0x37cce38a, L:/127.0.0.1:49230 - R:127.0.0.1/127.0.0.1:7002]]
+    10:27:50.121 [Thread-3] DEBUG org.redisson.command.CommandAsyncService - acquired connection for command (EVAL) and params [if (redis.call('exists', KEYS[1]) == 0) then redis.call('hset', KEYS[1], ARGV[2], 1); redis.call('pexpire', KEYS[1], ARGV[1]); return nil; end; if (redis.call('hexists', KEYS[1], ARGV[2]) == 1) then redis.call('hincrby', KEYS[1], ARGV[2], 1); redis.call('pexpire', KEYS[1], ARGV[1]); return nil; end; return redis.call('pttl', KEYS[1]);, 1, redisLock_test123, 120000, 20e96666-d967-4d3c-ac94-abeb14493160:22] from slot NodeSource [slot=null, addr=null, redisClient=null, redirect=null, entry=MasterSlaveEntry [masterEntry=[freeSubscribeConnectionsAmount=0, freeSubscribeConnectionsCounter=49, freeConnectionsAmount=30, freeConnectionsCounter=9998, freezed=false, freezeReason=null, client=[addr=redis://127.0.0.1:7002], nodeType=MASTER, firstFail=0]]] using node 127.0.0.1/127.0.0.1:7002... RedisConnection@1231431314 [redisClient=[addr=redis://127.0.0.1:7002], channel=[id: 0xea1b90d2, L:/127.0.0.1:49286 - R:127.0.0.1/127.0.0.1:7002]]
+    10:27:50.126 [redisson-netty-1-1] DEBUG org.redisson.command.CommandAsyncService - connection released for command (EVAL) and params [if (redis.call('exists', KEYS[1]) == 0) then redis.call('hset', KEYS[1], ARGV[2], 1); redis.call('pexpire', KEYS[1], ARGV[1]); return nil; end; if (redis.call('hexists', KEYS[1], ARGV[2]) == 1) then redis.call('hincrby', KEYS[1], ARGV[2], 1); redis.call('pexpire', KEYS[1], ARGV[1]); return nil; end; return redis.call('pttl', KEYS[1]);, 1, redisLock_test123, 120000, 20e96666-d967-4d3c-ac94-abeb14493160:20] from slot NodeSource [slot=null, addr=null, redisClient=null, redirect=null, entry=MasterSlaveEntry [masterEntry=[freeSubscribeConnectionsAmount=0, freeSubscribeConnectionsCounter=49, freeConnectionsAmount=31, freeConnectionsCounter=9999, freezed=false, freezeReason=null, client=[addr=redis://127.0.0.1:7002], nodeType=MASTER, firstFail=0]]] using connection RedisConnection@1475932758 [redisClient=[addr=redis://127.0.0.1:7002], channel=[id: 0x37cce38a, L:/127.0.0.1:49230 - R:127.0.0.1/127.0.0.1:7002]]
+    10:27:50.127 [redisson-netty-1-1] DEBUG org.redisson.command.CommandAsyncService - connection released for command (EVAL) and params [if (redis.call('exists', KEYS[1]) == 0) then redis.call('hset', KEYS[1], ARGV[2], 1); redis.call('pexpire', KEYS[1], ARGV[1]); return nil; end; if (redis.call('hexists', KEYS[1], ARGV[2]) == 1) then redis.call('hincrby', KEYS[1], ARGV[2], 1); redis.call('pexpire', KEYS[1], ARGV[1]); return nil; end; return redis.call('pttl', KEYS[1]);, 1, redisLock_test123, 120000, 20e96666-d967-4d3c-ac94-abeb14493160:22] from slot NodeSource [slot=null, addr=null, redisClient=null, redirect=null, entry=MasterSlaveEntry [masterEntry=[freeSubscribeConnectionsAmount=0, freeSubscribeConnectionsCounter=49, freeConnectionsAmount=32, freeConnectionsCounter=10000, freezed=false, freezeReason=null, client=[addr=redis://127.0.0.1:7002], nodeType=MASTER, firstFail=0]]] using connection RedisConnection@1231431314 [redisClient=[addr=redis://127.0.0.1:7002], channel=[id: 0xea1b90d2, L:/127.0.0.1:49286 - R:127.0.0.1/127.0.0.1:7002]]
+    ======获得锁后进行相应的操作======
+    10:27:51.081 [Thread-2] DEBUG org.redisson.cluster.ClusterConnectionManager - slot 12809 for redisLock_test123
+    10:27:51.082 [Thread-2] DEBUG org.redisson.command.CommandAsyncService - acquired connection for command (EVAL) and params [if (redis.call('exists', KEYS[1]) == 0) then redis.call('publish', KEYS[2], ARGV[1]); return 1; end;if (redis.call('hexists', KEYS[1], ARGV[3]) == 0) then return nil;end; local counter = redis.call('hincrby', KEYS[1], ARGV[3], -1); if (counter > 0) then redis.call('pexpire', KEYS[1], ARGV[2]); return 0; else redis.call('del', KEYS[1]); redis.call('publish', KEYS[2], ARGV[1]); return 1; end; return nil;, 2, redisLock_test123, redisson_lock__channel:{redisLock_test123}, 0, 30000, 20e96666-d967-4d3c-ac94-abeb14493160:21] from slot NodeSource [slot=null, addr=null, redisClient=null, redirect=null, entry=MasterSlaveEntry [masterEntry=[freeSubscribeConnectionsAmount=0, freeSubscribeConnectionsCounter=49, freeConnectionsAmount=31, freeConnectionsCounter=9999, freezed=false, freezeReason=null, client=[addr=redis://127.0.0.1:7002], nodeType=MASTER, firstFail=0]]] using node 127.0.0.1/127.0.0.1:7002... RedisConnection@697105324 [redisClient=[addr=redis://127.0.0.1:7002], channel=[id: 0x3b2eb2ff, L:/127.0.0.1:49244 - R:127.0.0.1/127.0.0.1:7002]]
+    10:27:51.086 [redisson-netty-1-5] DEBUG org.redisson.command.CommandAsyncService - connection released for command (EVAL) and params [if (redis.call('exists', KEYS[1]) == 0) then redis.call('publish', KEYS[2], ARGV[1]); return 1; end;if (redis.call('hexists', KEYS[1], ARGV[3]) == 0) then return nil;end; local counter = redis.call('hincrby', KEYS[1], ARGV[3], -1); if (counter > 0) then redis.call('pexpire', KEYS[1], ARGV[2]); return 0; else redis.call('del', KEYS[1]); redis.call('publish', KEYS[2], ARGV[1]); return 1; end; return nil;, 2, redisLock_test123, redisson_lock__channel:{redisLock_test123}, 0, 30000, 20e96666-d967-4d3c-ac94-abeb14493160:21] from slot NodeSource [slot=null, addr=null, redisClient=null, redirect=null, entry=MasterSlaveEntry [masterEntry=[freeSubscribeConnectionsAmount=0, freeSubscribeConnectionsCounter=49, freeConnectionsAmount=32, freeConnectionsCounter=10000, freezed=false, freezeReason=null, client=[addr=redis://127.0.0.1:7002], nodeType=MASTER, firstFail=0]]] using connection RedisConnection@697105324 [redisClient=[addr=redis://127.0.0.1:7002], channel=[id: 0x3b2eb2ff, L:/127.0.0.1:49244 - R:127.0.0.1/127.0.0.1:7002]]
+    ======unlock======Thread-2
+    =============================
+    10:27:51.090 [Thread-1] DEBUG org.redisson.cluster.ClusterConnectionManager - slot 12809 for redisLock_test123
+    10:27:51.090 [Thread-3] DEBUG org.redisson.cluster.ClusterConnectionManager - slot 12809 for redisLock_test123
+    10:27:51.091 [Thread-1] DEBUG org.redisson.command.CommandAsyncService - acquired connection for command (EVAL) and params [if (redis.call('exists', KEYS[1]) == 0) then redis.call('hset', KEYS[1], ARGV[2], 1); redis.call('pexpire', KEYS[1], ARGV[1]); return nil; end; if (redis.call('hexists', KEYS[1], ARGV[2]) == 1) then redis.call('hincrby', KEYS[1], ARGV[2], 1); redis.call('pexpire', KEYS[1], ARGV[1]); return nil; end; return redis.call('pttl', KEYS[1]);, 1, redisLock_test123, 120000, 20e96666-d967-4d3c-ac94-abeb14493160:20] from slot NodeSource [slot=null, addr=null, redisClient=null, redirect=null, entry=MasterSlaveEntry [masterEntry=[freeSubscribeConnectionsAmount=0, freeSubscribeConnectionsCounter=49, freeConnectionsAmount=30, freeConnectionsCounter=9998, freezed=false, freezeReason=null, client=[addr=redis://127.0.0.1:7002], nodeType=MASTER, firstFail=0]]] using node 127.0.0.1/127.0.0.1:7002... RedisConnection@489743733 [redisClient=[addr=redis://127.0.0.1:7002], channel=[id: 0xc2cb57a1, L:/127.0.0.1:49204 - R:127.0.0.1/127.0.0.1:7002]]
+    10:27:51.091 [Thread-3] DEBUG org.redisson.command.CommandAsyncService - acquired connection for command (EVAL) and params [if (redis.call('exists', KEYS[1]) == 0) then redis.call('hset', KEYS[1], ARGV[2], 1); redis.call('pexpire', KEYS[1], ARGV[1]); return nil; end; if (redis.call('hexists', KEYS[1], ARGV[2]) == 1) then redis.call('hincrby', KEYS[1], ARGV[2], 1); redis.call('pexpire', KEYS[1], ARGV[1]); return nil; end; return redis.call('pttl', KEYS[1]);, 1, redisLock_test123, 120000, 20e96666-d967-4d3c-ac94-abeb14493160:22] from slot NodeSource [slot=null, addr=null, redisClient=null, redirect=null, entry=MasterSlaveEntry [masterEntry=[freeSubscribeConnectionsAmount=0, freeSubscribeConnectionsCounter=49, freeConnectionsAmount=30, freeConnectionsCounter=9998, freezed=false, freezeReason=null, client=[addr=redis://127.0.0.1:7002], nodeType=MASTER, firstFail=0]]] using node 127.0.0.1/127.0.0.1:7002... RedisConnection@562253068 [redisClient=[addr=redis://127.0.0.1:7002], channel=[id: 0x69c6d83a, L:/127.0.0.1:49260 - R:127.0.0.1/127.0.0.1:7002]]
+    10:27:51.095 [redisson-netty-1-1] DEBUG org.redisson.command.CommandAsyncService - connection released for command (EVAL) and params [if (redis.call('exists', KEYS[1]) == 0) then redis.call('hset', KEYS[1], ARGV[2], 1); redis.call('pexpire', KEYS[1], ARGV[1]); return nil; end; if (redis.call('hexists', KEYS[1], ARGV[2]) == 1) then redis.call('hincrby', KEYS[1], ARGV[2], 1); redis.call('pexpire', KEYS[1], ARGV[1]); return nil; end; return redis.call('pttl', KEYS[1]);, 1, redisLock_test123, 120000, 20e96666-d967-4d3c-ac94-abeb14493160:22] from slot NodeSource [slot=null, addr=null, redisClient=null, redirect=null, entry=MasterSlaveEntry [masterEntry=[freeSubscribeConnectionsAmount=0, freeSubscribeConnectionsCounter=49, freeConnectionsAmount=31, freeConnectionsCounter=9999, freezed=false, freezeReason=null, client=[addr=redis://127.0.0.1:7002], nodeType=MASTER, firstFail=0]]] using connection RedisConnection@562253068 [redisClient=[addr=redis://127.0.0.1:7002], channel=[id: 0x69c6d83a, L:/127.0.0.1:49260 - R:127.0.0.1/127.0.0.1:7002]]
+    10:27:51.096 [redisson-netty-1-6] DEBUG org.redisson.command.CommandAsyncService - connection released for command (EVAL) and params [if (redis.call('exists', KEYS[1]) == 0) then redis.call('hset', KEYS[1], ARGV[2], 1); redis.call('pexpire', KEYS[1], ARGV[1]); return nil; end; if (redis.call('hexists', KEYS[1], ARGV[2]) == 1) then redis.call('hincrby', KEYS[1], ARGV[2], 1); redis.call('pexpire', KEYS[1], ARGV[1]); return nil; end; return redis.call('pttl', KEYS[1]);, 1, redisLock_test123, 120000, 20e96666-d967-4d3c-ac94-abeb14493160:20] from slot NodeSource [slot=null, addr=null, redisClient=null, redirect=null, entry=MasterSlaveEntry [masterEntry=[freeSubscribeConnectionsAmount=0, freeSubscribeConnectionsCounter=49, freeConnectionsAmount=32, freeConnectionsCounter=10000, freezed=false, freezeReason=null, client=[addr=redis://127.0.0.1:7002], nodeType=MASTER, firstFail=0]]] using connection RedisConnection@489743733 [redisClient=[addr=redis://127.0.0.1:7002], channel=[id: 0xc2cb57a1, L:/127.0.0.1:49204 - R:127.0.0.1/127.0.0.1:7002]]
+    ======lock======Thread-1
+    ======获得锁后进行相应的操作======
+    10:27:52.102 [Thread-1] DEBUG org.redisson.cluster.ClusterConnectionManager - slot 12809 for redisLock_test123
+    10:27:52.103 [Thread-1] DEBUG org.redisson.command.CommandAsyncService - acquired connection for command (EVAL) and params [if (redis.call('exists', KEYS[1]) == 0) then redis.call('publish', KEYS[2], ARGV[1]); return 1; end;if (redis.call('hexists', KEYS[1], ARGV[3]) == 0) then return nil;end; local counter = redis.call('hincrby', KEYS[1], ARGV[3], -1); if (counter > 0) then redis.call('pexpire', KEYS[1], ARGV[2]); return 0; else redis.call('del', KEYS[1]); redis.call('publish', KEYS[2], ARGV[1]); return 1; end; return nil;, 2, redisLock_test123, redisson_lock__channel:{redisLock_test123}, 0, 30000, 20e96666-d967-4d3c-ac94-abeb14493160:20] from slot NodeSource [slot=null, addr=null, redisClient=null, redirect=null, entry=MasterSlaveEntry [masterEntry=[freeSubscribeConnectionsAmount=0, freeSubscribeConnectionsCounter=49, freeConnectionsAmount=31, freeConnectionsCounter=9999, freezed=false, freezeReason=null, client=[addr=redis://127.0.0.1:7002], nodeType=MASTER, firstFail=0]]] using node 127.0.0.1/127.0.0.1:7002... RedisConnection@2085319794 [redisClient=[addr=redis://127.0.0.1:7002], channel=[id: 0x7b0b77c0, L:/127.0.0.1:49250 - R:127.0.0.1/127.0.0.1:7002]]
+    10:27:52.107 [redisson-netty-1-5] DEBUG org.redisson.command.CommandAsyncService - connection released for command (EVAL) and params [if (redis.call('exists', KEYS[1]) == 0) then redis.call('publish', KEYS[2], ARGV[1]); return 1; end;if (redis.call('hexists', KEYS[1], ARGV[3]) == 0) then return nil;end; local counter = redis.call('hincrby', KEYS[1], ARGV[3], -1); if (counter > 0) then redis.call('pexpire', KEYS[1], ARGV[2]); return 0; else redis.call('del', KEYS[1]); redis.call('publish', KEYS[2], ARGV[1]); return 1; end; return nil;, 2, redisLock_test123, redisson_lock__channel:{redisLock_test123}, 0, 30000, 20e96666-d967-4d3c-ac94-abeb14493160:20] from slot NodeSource [slot=null, addr=null, redisClient=null, redirect=null, entry=MasterSlaveEntry [masterEntry=[freeSubscribeConnectionsAmount=0, freeSubscribeConnectionsCounter=49, freeConnectionsAmount=32, freeConnectionsCounter=10000, freezed=false, freezeReason=null, client=[addr=redis://127.0.0.1:7002], nodeType=MASTER, firstFail=0]]] using connection RedisConnection@2085319794 [redisClient=[addr=redis://127.0.0.1:7002], channel=[id: 0x7b0b77c0, L:/127.0.0.1:49250 - R:127.0.0.1/127.0.0.1:7002]]
+    ======unlock======Thread-1
+    =============================
+    10:27:52.111 [Thread-3] DEBUG org.redisson.cluster.ClusterConnectionManager - slot 12809 for redisLock_test123
+    10:27:52.112 [Thread-3] DEBUG org.redisson.command.CommandAsyncService - acquired connection for command (EVAL) and params [if (redis.call('exists', KEYS[1]) == 0) then redis.call('hset', KEYS[1], ARGV[2], 1); redis.call('pexpire', KEYS[1], ARGV[1]); return nil; end; if (redis.call('hexists', KEYS[1], ARGV[2]) == 1) then redis.call('hincrby', KEYS[1], ARGV[2], 1); redis.call('pexpire', KEYS[1], ARGV[1]); return nil; end; return redis.call('pttl', KEYS[1]);, 1, redisLock_test123, 120000, 20e96666-d967-4d3c-ac94-abeb14493160:22] from slot NodeSource [slot=null, addr=null, redisClient=null, redirect=null, entry=MasterSlaveEntry [masterEntry=[freeSubscribeConnectionsAmount=0, freeSubscribeConnectionsCounter=49, freeConnectionsAmount=31, freeConnectionsCounter=9999, freezed=false, freezeReason=null, client=[addr=redis://127.0.0.1:7002], nodeType=MASTER, firstFail=0]]] using node 127.0.0.1/127.0.0.1:7002... RedisConnection@1360268292 [redisClient=[addr=redis://127.0.0.1:7002], channel=[id: 0xe28d264d, L:/127.0.0.1:49406 - R:127.0.0.1/127.0.0.1:7002]]
+    10:27:52.115 [redisson-netty-1-7] DEBUG org.redisson.command.CommandAsyncService - connection released for command (EVAL) and params [if (redis.call('exists', KEYS[1]) == 0) then redis.call('hset', KEYS[1], ARGV[2], 1); redis.call('pexpire', KEYS[1], ARGV[1]); return nil; end; if (redis.call('hexists', KEYS[1], ARGV[2]) == 1) then redis.call('hincrby', KEYS[1], ARGV[2], 1); redis.call('pexpire', KEYS[1], ARGV[1]); return nil; end; return redis.call('pttl', KEYS[1]);, 1, redisLock_test123, 120000, 20e96666-d967-4d3c-ac94-abeb14493160:22] from slot NodeSource [slot=null, addr=null, redisClient=null, redirect=null, entry=MasterSlaveEntry [masterEntry=[freeSubscribeConnectionsAmount=0, freeSubscribeConnectionsCounter=49, freeConnectionsAmount=32, freeConnectionsCounter=10000, freezed=false, freezeReason=null, client=[addr=redis://127.0.0.1:7002], nodeType=MASTER, firstFail=0]]] using connection RedisConnection@1360268292 [redisClient=[addr=redis://127.0.0.1:7002], channel=[id: 0xe28d264d, L:/127.0.0.1:49406 - R:127.0.0.1/127.0.0.1:7002]]
+    ======lock======Thread-3
+    10:27:53.120 [Thread-3] DEBUG org.redisson.cluster.ClusterConnectionManager - slot 12809 for redisLock_test123
+    ======获得锁后进行相应的操作======
+    10:27:53.121 [Thread-3] DEBUG org.redisson.command.CommandAsyncService - acquired connection for command (EVAL) and params [if (redis.call('exists', KEYS[1]) == 0) then redis.call('publish', KEYS[2], ARGV[1]); return 1; end;if (redis.call('hexists', KEYS[1], ARGV[3]) == 0) then return nil;end; local counter = redis.call('hincrby', KEYS[1], ARGV[3], -1); if (counter > 0) then redis.call('pexpire', KEYS[1], ARGV[2]); return 0; else redis.call('del', KEYS[1]); redis.call('publish', KEYS[2], ARGV[1]); return 1; end; return nil;, 2, redisLock_test123, redisson_lock__channel:{redisLock_test123}, 0, 30000, 20e96666-d967-4d3c-ac94-abeb14493160:22] from slot NodeSource [slot=null, addr=null, redisClient=null, redirect=null, entry=MasterSlaveEntry [masterEntry=[freeSubscribeConnectionsAmount=0, freeSubscribeConnectionsCounter=49, freeConnectionsAmount=31, freeConnectionsCounter=9999, freezed=false, freezeReason=null, client=[addr=redis://127.0.0.1:7002], nodeType=MASTER, firstFail=0]]] using node 127.0.0.1/127.0.0.1:7002... RedisConnection@1735465853 [redisClient=[addr=redis://127.0.0.1:7002], channel=[id: 0x669d66fa, L:/127.0.0.1:49254 - R:127.0.0.1/127.0.0.1:7002]]
+    ======unlock======Thread-3
+    =============================
+    ```
+    
+    
    
