@@ -1,5 +1,5 @@
-# learning-and-preparing-for-new-opportunities
-Always keep learning and look forward to new opportunities.
+# Always keep learning. 
+Focus on back-end development technology learning.
 
 |[Redis](./redis.md)|[Java Proxy](./java_proxy_and_cglib.md)|[Spring](./spring.md)|
 |:------:|:------:|:------:|
