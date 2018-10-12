@@ -1339,6 +1339,7 @@ PONG
     [OK] All 16384 slots covered.
     ```
     - 使用Redission构建redLock
+
     &#160; &#160; &#160; &#160;Redis集群使用分片的方式保存键值对，redis-cluster采用slot(槽)的概念，一共16384个槽位，分布在集群中的所有master实例上。保存数据时，直接对key值做CRC16得到的校验值对16384取模，将键值对存储到对应的槽位所在的实例上。
     
     ```java
