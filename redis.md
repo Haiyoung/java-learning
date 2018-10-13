@@ -1,37 +1,37 @@
 Redis
 <!-- TOC -->
 
-- [Redis 官网](#redis-官网)
-- [Redis 概况](#redis-概况)
-    - [Redis 是什么？](#redis-是什么)
-    - [Redis 数据结构](#redis-数据结构)
-        - [value 对应的五种数据结构](#value-对应的五种数据结构)
-        - [Redis 核心对象 redisObject](#redis-核心对象-redisobject)
-            - [编码方式（encoding）](#编码方式encoding)
-        - [Redis 五种数据结构对应的内部编码](#redis-五种数据结构对应的内部编码)
+- [Redis 官网](#redis-%E5%AE%98%E7%BD%91)
+- [Redis 概况](#redis-%E6%A6%82%E5%86%B5)
+    - [Redis 是什么？](#redis-%E6%98%AF%E4%BB%80%E4%B9%88)
+    - [Redis 数据结构](#redis-%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84)
+        - [value 对应的五种数据结构](#value-%E5%AF%B9%E5%BA%94%E7%9A%84%E4%BA%94%E7%A7%8D%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84)
+        - [Redis 核心对象 redisObject](#redis-%E6%A0%B8%E5%BF%83%E5%AF%B9%E8%B1%A1-redisobject)
+            - [编码方式（encoding）](#%E7%BC%96%E7%A0%81%E6%96%B9%E5%BC%8Fencoding)
+        - [Redis 五种数据结构对应的内部编码](#redis-%E4%BA%94%E7%A7%8D%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%AF%B9%E5%BA%94%E7%9A%84%E5%86%85%E9%83%A8%E7%BC%96%E7%A0%81)
     - [reference](#reference)
-- [搭建 Redis 环境](#搭建-redis-环境)
-    - [启动 redis server](#启动-redis-server)
-    - [启动 redis-cli](#启动-redis-cli)
-    - [redis-cli连接远程服务](#redis-cli连接远程服务)
-    - [reference](#reference-1)
-- [Redis命令](#redis命令)
-    - [Redis keys 命令](#redis-keys-命令)
-    - [Redis 字符串命令](#redis-字符串命令)
-    - [Redis hash 命令](#redis-hash-命令)
-    - [Redis list 命令](#redis-list-命令)
-    - [Redis set 命令](#redis-set-命令)
-    - [Redis sorted set 命令](#redis-sorted-set-命令)
-    - [Redis HyperLogLog 命令](#redis-hyperloglog-命令)
-    - [reference](#reference-2)
-- [Redis 持久化](#redis-持久化)
+- [搭建 Redis 环境](#%E6%90%AD%E5%BB%BA-redis-%E7%8E%AF%E5%A2%83)
+    - [启动 redis server](#%E5%90%AF%E5%8A%A8-redis-server)
+    - [启动 redis-cli](#%E5%90%AF%E5%8A%A8-redis-cli)
+    - [redis-cli连接远程服务](#redis-cli%E8%BF%9E%E6%8E%A5%E8%BF%9C%E7%A8%8B%E6%9C%8D%E5%8A%A1)
+    - [reference](#reference)
+- [Redis命令](#redis%E5%91%BD%E4%BB%A4)
+    - [Redis keys 命令](#redis-keys-%E5%91%BD%E4%BB%A4)
+    - [Redis 字符串命令](#redis-%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%91%BD%E4%BB%A4)
+    - [Redis hash 命令](#redis-hash-%E5%91%BD%E4%BB%A4)
+    - [Redis list 命令](#redis-list-%E5%91%BD%E4%BB%A4)
+    - [Redis set 命令](#redis-set-%E5%91%BD%E4%BB%A4)
+    - [Redis sorted set 命令](#redis-sorted-set-%E5%91%BD%E4%BB%A4)
+    - [Redis HyperLogLog 命令](#redis-hyperloglog-%E5%91%BD%E4%BB%A4)
+    - [reference](#reference)
+- [Redis 持久化](#redis-%E6%8C%81%E4%B9%85%E5%8C%96)
     - [RDB](#rdb)
     - [AOF](#aof)
-    - [持久化最佳策略](#持久化最佳策略)
-    - [reference](#reference-3)
-- [Redis 实现分布式锁](#redis-实现分布式锁)
-    - [单机模式的Redis分布式锁](#单机模式的redis分布式锁)
-    - [集群模式的Redis分布式锁 Redlock](#集群模式的redis分布式锁-redlock)
+    - [持久化最佳策略](#%E6%8C%81%E4%B9%85%E5%8C%96%E6%9C%80%E4%BD%B3%E7%AD%96%E7%95%A5)
+    - [reference](#reference)
+- [Redis 实现分布式锁](#redis-%E5%AE%9E%E7%8E%B0%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81)
+    - [单机模式的Redis分布式锁](#%E5%8D%95%E6%9C%BA%E6%A8%A1%E5%BC%8F%E7%9A%84redis%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81)
+    - [集群模式的Redis分布式锁 Redlock](#%E9%9B%86%E7%BE%A4%E6%A8%A1%E5%BC%8F%E7%9A%84redis%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81-redlock)
 
 <!-- /TOC -->
 ### Redis 官网
@@ -1338,6 +1338,8 @@ PONG
     >>> Check slots coverage...
     [OK] All 16384 slots covered.
     ```
+    - redis-cluster简单集群示例图
+    ![Redis rdbs](/imgs/redis/11_redis_simple_cluster.png)
     - 使用Redission构建redLock
 
     &#160; &#160; &#160; &#160;Redis集群使用分片的方式保存键值对，redis-cluster采用slot(槽)的概念，一共16384个槽位，分布在集群中的所有master实例上。保存数据时，直接对key值做CRC16校验后得到的校验值对16384取模，将键值对存储到对应的槽位所在的实例上。
